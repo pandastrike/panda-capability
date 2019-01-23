@@ -1,0 +1,44 @@
+{
+  "name": "panda-capability",
+  "version": "0.0.1",
+  "description": "Sane Web Capabilities",
+  "main": "build/npm/src/index.js",
+  "scripts": {
+    "test": "p9k npm:test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pandastrike/panda-capability.git"
+  },
+  "keywords": [
+    "cryptography",
+    "capability",
+    "security",
+    "authorization"
+  ],
+  "contributors": [
+    {
+      "name": "Dan Yoder",
+      "email": "dan@pandastrike.com"
+    },
+    {
+      "name": "David Harper",
+      "email": "david@pandastrike.com"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pandastrike/panda-capability/issues"
+  },
+  "homepage": "https://github.com/pandastrike/panda-capability#readme",
+  "devDependencies": {
+    "amen": "^2.0.4",
+    "panda-9000": "^4.4.0",
+    "panda-builder": "^3.2.1",
+    "panda-confidential": "file:../panda-confidential"
+  },
+  "dependencies": {
+    "panda-generics": "4.2.0",
+    "panda-parchment": "^4.2.0"
+  }
+}
