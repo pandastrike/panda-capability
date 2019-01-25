@@ -19,9 +19,9 @@ Container = (library, confidential) ->
         when "utf8" then fromJSON value
         else fromJSON convert from: hint, to: "utf8", value
 
-      for resource, methods of capchain
+      for template, methods of capchain
         for method, capability of methods
-          capchain[resource][method] = Grant.from "object", capability
+          capchain[template][method] = Grant.from "object", capability
 
       new Capchain capchain
 

@@ -4,7 +4,8 @@ import {confidential} from "panda-confidential"
 import {toJSON} from "panda-parchment"
 import PandaCapability from "../src"
 
-import {APIKeyPair, getProfile} from "my-library"
+import {APIKeyPair, newProfile, getCapchain} from "api-library"
+import {LocalKeyPair} from "local-library"
 
 do ->
   await print await test "Panda Capability", ->
@@ -13,24 +14,24 @@ do ->
     {issue} = PandaCapability Confidential
 
     # API creates a profile for Alice.
-    {publicKey:alice} = getProfile "alice"
+    alice = newProfile "alice"
 
-    # Issue capabilities for her resources.
-    capchain = await issue APIKeyPair, alice, [{
-      template: "root/alice"
-      methods: ["OPTIONS", "GET", "PUT", "DELETE"]
-      },{
-      template: "/profiles/alice"
-      methods: ["OPTIONS", "GET", "PUT"]
-      },{
+    # API Issues capabilities for her resources.
+    capchain = await issue APIKeyPair, alice, [
+        template: "root/alice"
+        methods: ["OPTIONS", "GET", "PUT", "DELETE"]
+      ,
+        template: "/profiles/alice"
+        methods: ["OPTIONS", "GET", "PUT"]
+      ,
       template: "/profiles/alice/devices/{device}"
       methods: ["OPTIONS", "POST"]
       },{
       template: "/profiles/alice/devices/{device}"
       methods: ["OPTIONS", "GET", "PUT", "POST", "DELETE"]
       },{
-      template: "/profiles/alice/dashes{?page}"
-      methods: ["OPTIONS", "GET", "POST"]
+      template: "/profiles/alice/dashes"
+      methods: ["OPTIONS", "POST"]
       },{
       template: "/profiles/alice/dashes/{id}"
       methods: ["OPTIONS", "GET", "PUT"]
@@ -53,3 +54,57 @@ do ->
       template: "/profiles/alice/media/{id}"
       methods: ["OPTIONS", "POST", "DELETE"]
     }]
+
+    # Serialize the capchain for transport to alice.
+    serializedCapchain = capchain.to "utf8"
+
+
+    #======================================
+
+
+    # Later, when the alice wants to excercise one of the capabilities in
+    # her capchain by creating a new dash.
+
+    # alice hydrates her capchain from serialized storage
+    capchain = Capchain.from "utf8", serializedCapchain
+
+    # alice grabs relevant grant.
+    # (Template could come from panda-sky-client)
+    grant = capchain["/profiles/alice/dashes"]["POST"]
+
+    # alice specifies the parameters for the template; none for this request.
+    parameters =
+      template: {id}
+      body: "Hello, World!"
+
+    # alice exercises her capability. This is an instanciated class because
+    # it may be reused and adopt other request parameters:
+    # template, body, nonce, timestamp, etc.
+    authority = exercise grant, localKeyPair, parameters
+
+    # As the HTTP request is formed, alice uses the authorization to populate
+    # the AUTHORIZATION header.
+    # yields "X-Capability base64StringRFfBy/1mioLtrsxk2....."
+
+    headers = authorization: authority.stamp()
+
+
+
+    #=======================================
+
+
+    # Back over in the API, it recieves the request from alice and must validate
+    # the capability assertion.
+
+    # API instanciates a Request class to parse the capability assertion and
+    # the request properties.
+    request = Request.from APIHandler
+
+    # API hydrates alice's capchain from serialized storage
+    capchain = Capchain.from "utf8", getCapchain "alice"
+
+    # API uses it to verify the authorization header.
+    if result = verify capchain, authorization
+      ## free to proceed
+    else
+      # verficiation failed

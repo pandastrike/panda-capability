@@ -12,8 +12,6 @@ Issue = (library, confidential) ->
     (issuerKeyPair, recipient, capabilities) ->
       capchain = {}
       for capability in capabilities
-        capchain[capability.template] = {}
-
         capability.recipient = recipient
         {publicKey, privateKey} = await SignatureKeyPair.create()
         capability.use = [ publicKey.to "base64" ]
@@ -26,7 +24,11 @@ Issue = (library, confidential) ->
           declaration: declaration.to "base64"
           use: [ privateKey.to "base64" ]
 
+        capchain[capability.template] = {}
+
         for method in capability.methods
           capchain[capability.template][method] = grant
 
       Capchain.from "object", capchain
+
+export default Issue
