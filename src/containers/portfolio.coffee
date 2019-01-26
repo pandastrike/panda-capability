@@ -4,8 +4,8 @@ Container = (library, confidential) ->
   {Grant} = library
   {convert} = confidential
 
-  class Capchain
-    constructor: (capchain) -> include @, capchain
+  class Portfolio
+    constructor: (portfolio) -> include @, portfolio
 
     to: (hint) ->
       if hint == "utf8"
@@ -14,16 +14,16 @@ Container = (library, confidential) ->
         convert from: "utf8", to: hint, toJSON @
 
     @from: (hint, value) ->
-      capchain = switch hint
+      portfolio = switch hint
         when "object" then value
         when "utf8" then fromJSON value
         else fromJSON convert from: hint, to: "utf8", value
 
-      for template, methods of capchain
+      for template, methods of portfolio
         for method, capability of methods
-          capchain[template][method] = Grant.from "object", capability
+          portfolio[template][method] = Grant.from "object", capability
 
-      new Capchain capchain
+      new Portfolio portfolio
 
     @isType: isType @
 

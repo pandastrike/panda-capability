@@ -4,107 +4,86 @@ import {confidential} from "panda-confidential"
 import {toJSON} from "panda-parchment"
 import PandaCapability from "../src"
 
-import {APIKeyPair, newProfile, getCapchain} from "api-library"
-import {LocalKeyPair} from "local-library"
-
 do ->
   await print await test "Panda Capability", ->
     Confidential = confidential()
     {SignatureKeyPair, Plaintext, sign} = Confidential
     {issue} = PandaCapability Confidential
 
-    # API creates a profile for Alice.
-    alice = newProfile "alice"
+    # The API has its own signature key pair for issuing capabilites to people
+    APIKeyPair = await SignatureKeyPair.create()
 
-    # API Issues capabilities for her resources.
-    capchain = await issue APIKeyPair, alice, [
-        template: "root/alice"
-        methods: ["OPTIONS", "GET", "PUT", "DELETE"]
+    # Alice creates her profile signing key pair and sends the public key to
+    # the API when she asks it to create a profile for her.
+    Alice = await SignatureKeyPair.create()
+    alice = Alice.publicKey
+
+
+    #==========================================
+
+    # API creates a profile for Alice and
+    # issues a portfolio of granted capabilities for her resources.
+    portfolio = await issue APIKeyPair, alice, [
+        template: "/profiles/alice/dashes"
+        methods: ["OPTIONS", "POST"]
       ,
-        template: "/profiles/alice"
+        template: "/profiles/alice/dashes/{id}"
         methods: ["OPTIONS", "GET", "PUT"]
-      ,
-      template: "/profiles/alice/devices/{device}"
-      methods: ["OPTIONS", "POST"]
-      },{
-      template: "/profiles/alice/devices/{device}"
-      methods: ["OPTIONS", "GET", "PUT", "POST", "DELETE"]
-      },{
-      template: "/profiles/alice/dashes"
-      methods: ["OPTIONS", "POST"]
-      },{
-      template: "/profiles/alice/dashes/{id}"
-      methods: ["OPTIONS", "GET", "PUT"]
-      },{
-      template: "/profiles/alice/shares/{id}"
-      methods: ["OPTIONS", "POST"]
-      },{
-      template: "/profiles/alice/replies/{id}"
-      methods: ["OPTIONS", "POST"]
-      },{
-      template: "/profiles/alice/contributors/{target}"
-      methods: ["OPTIONS", "POST", "DELETE"]
-      },{
-      template: "/profiles/alice/blocks/{target}"
-      methods: ["OPTIONS", "POST", "DELETE"]
-      },{
-      template: "/profiles/alice/upload"
-      methods: ["OPTIONS", "POST"]
-      },{
-      template: "/profiles/alice/media/{id}"
-      methods: ["OPTIONS", "POST", "DELETE"]
-    }]
+    ]
 
-    # Serialize the capchain for transport to alice.
-    serializedCapchain = capchain.to "utf8"
+    # Serialize the portfolio for transport to alice.
+    serializedPortfolio = portfolio.to "utf8"
 
 
     #======================================
 
 
     # Later, when the alice wants to excercise one of the capabilities in
-    # her capchain by creating a new dash.
+    # her portfolio by creating a new dash.
 
-    # alice hydrates her capchain from serialized storage
-    capchain = Capchain.from "utf8", serializedCapchain
+    # alice hydrates her portfolio from serialized storage
+    portfolio = Portfolio.from "utf8", serializedPortfolio
 
     # alice grabs relevant grant.
     # (Template could come from panda-sky-client)
-    grant = capchain["/profiles/alice/dashes"]["POST"]
+    grant = portfolio["/profiles/alice/dashes"]["POST"]
 
     # alice specifies the parameters for the template; none for this request.
-    parameters =
-      template: {id}
-      body: "Hello, World!"
+    parameters = {}
 
-    # alice exercises her capability. This is an instanciated class because
-    # it may be reused and adopt other request parameters:
-    # template, body, nonce, timestamp, etc.
-    authority = exercise grant, localKeyPair, parameters
-
-    # As the HTTP request is formed, alice uses the authorization to populate
-    # the AUTHORIZATION header.
-    # yields "X-Capability base64StringRFfBy/1mioLtrsxk2....."
-
-    headers = authorization: authority.stamp()
+    # alice exercises her capability to populate the AUTHORIZATION header.
+    # yields an assertion.
+    assertion = exercise grant, Alice, parameters
+    headers = authorization: "X-Capability #{assertion.to "base64"}"
 
 
 
     #=======================================
 
 
-    # Back over in the API, it recieves the request from alice and must validate
-    # the capability assertion.
+    # Back over in the API, it recieves the request from alice
+    try
+      # API challenges the request's assertion
+      assertion = challenge request
+    catch e
+      assert.fail "challenge should have passed."
 
-    # API instanciates a Request class to parse the capability assertion and
-    # the request properties.
-    request = Request.from APIHandler
+    # The request passes this challenge and is internally consistent.
+    # The API gets back an instaciated assertion of that passed, including
+    # a dictionary of public signing keys used in its construction.
+    # The API is responsible for a revocation check on those keys
 
-    # API hydrates alice's capchain from serialized storage
-    capchain = Capchain.from "utf8", getCapchain "alice"
+    # For now, the API compares the assertion's keys against its copy of
+    # alice's portfolio.
+    apiKey = APIKeyPair.publicKey.to "base64"
 
-    # API uses it to verify the authorization header.
-    if result = verify capchain, authorization
-      ## free to proceed
-    else
-      # verficiation failed
+    {publicKeys, capability} = assertion
+    {useKey, clientKey, issuerKey} = publicKeys
+
+    portfolio = Portfolio.from "utf8", serializedPortfolio
+    grant = portfolio[capability.template][request.method]
+    {capability:{use, recipient}} = grant
+
+    assert.equal issuerKey, apiKey, "issuer key does not match"
+    assert.equal useKey, use[0], "use key does not match"
+    assert.equal clientKey, recipient, "client key does not match"
