@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "panda-generics": "4.2.0",
-    "panda-parchment": "^4.2.0"
+    "panda-parchment": "^4.2.0",
+    "url-template": "^2.0.8"
   }
 }

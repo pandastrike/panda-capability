@@ -1,4 +1,4 @@
-import {isString} from "panda-parchment"
+import {isString, toJSON} from "panda-parchment"
 import {Method} from "panda-generics"
 import T from "url-template"
 
@@ -20,10 +20,10 @@ Challenge = (library, confidential) ->
   (request) ->
     check request?.headers?.authorization?, "authorization header not set"
 
-    assertion = Assertion.from "base64", parse headers.authorization
+    assertion = Assertion.from "base64", parse request.headers.authorization
     check assertion.verify(), "invalid grant assertion"
 
-    {parameters, capability:{template, method}} = assertion
+    {parameters, capability} = assertion
     {template, methods} = capability
     {url, method, headers} = request
 

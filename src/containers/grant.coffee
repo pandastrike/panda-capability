@@ -1,22 +1,20 @@
 import URLTemplate from "url-template"
-import {isType, isString, isArray, empty,
+import {isType, isString, isArray, empty, isObject,
   fromJSON, toJSON} from "panda-parchment"
 import {isUse} from "../utils"
 
 # Sanity check on a grant object's structure.
 ifValid = (grant) ->
-  {capability, declaration, use} = grant
-  unless isObject capability
-    throw new Error "Invalid grant: capability = #{capability}"
+  {declaration, use} = grant
   unless isString declaration
-    throw new Error "Invalid grant: declaration = #{declaration}"
+    throw new Error "Invalid grant: declaration = #{toJSON declaration}"
   unless isUse use
-    throw new Error "Invalid grant: use = #{use}"
+    throw new Error "Invalid grant: use = #{toJSON use}"
   grant
 
 Container = (library, confidential) ->
   {Capability} = library
-  {convert, PublicKey, PrivateKey} = confidential
+  {convert, PublicKey, PrivateKey, Plaintext, sign} = confidential
 
   class Grant
     constructor: ({@capability, @declaration, @use}) ->

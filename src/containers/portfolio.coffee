@@ -1,4 +1,4 @@
-import {include, toJSON, fromJSON} from "panda-parchment"
+import {isType, include, toJSON, fromJSON} from "panda-parchment"
 
 Container = (library, confidential) ->
   {Grant} = library
@@ -20,8 +20,8 @@ Container = (library, confidential) ->
         else fromJSON convert from: hint, to: "utf8", value
 
       for template, methods of portfolio
-        for method, capability of methods
-          portfolio[template][method] = Grant.from "object", capability
+        for method, grant of methods
+          portfolio[template][method] = Grant.from "object", grant
 
       new Portfolio portfolio
 

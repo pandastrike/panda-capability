@@ -3,7 +3,7 @@ import {Method} from "panda-generics"
 
 Exercise = (library, confidential) ->
   {Grant, Assertion} = library
-  {SignatureKeyPair, PublicKey, PrivateKey} = confidential
+  {SignatureKeyPair, PublicKey, PrivateKey, sign} = confidential
 
   # Multiple signing key permutations are provided as convenience.
   exercise = Method.create default: (args...) ->
@@ -24,4 +24,6 @@ Exercise = (library, confidential) ->
     (grant, {publicKey, privateKey}, parameters) ->
       exercise grant, publicKey, privateKey, parameters
 
-export default Excercise
+  exercise
+
+export default Exercise

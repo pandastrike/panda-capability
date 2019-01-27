@@ -2,8 +2,8 @@ import Containers from "./containers"
 import Functions from "./functions"
 
 Capability = (confidential) ->
-  library = {confidential}
-  Containers library
-  Functions library
+  library = {}
+  Containers library, confidential
+  Functions library, confidential
 
 export default Capability

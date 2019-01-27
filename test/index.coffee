@@ -7,8 +7,8 @@ import PandaCapability from "../src"
 do ->
   await print await test "Panda Capability", ->
     Confidential = confidential()
-    {SignatureKeyPair, Plaintext, sign} = Confidential
-    {issue} = PandaCapability Confidential
+    {SignatureKeyPair} = Confidential
+    {issue, Portfolio, exercise, challenge} = PandaCapability Confidential
 
     # The API has its own signature key pair for issuing capabilites to people
     APIKeyPair = await SignatureKeyPair.create()
@@ -54,8 +54,11 @@ do ->
     # alice exercises her capability to populate the AUTHORIZATION header.
     # yields an assertion.
     assertion = exercise grant, Alice, parameters
-    headers = authorization: "X-Capability #{assertion.to "base64"}"
-
+    request =
+      url: "/profiles/alice/dashes"
+      method: "POST"
+      headers:
+        authorization: "X-Capability #{assertion.to "base64"}"
 
 
     #=======================================
@@ -66,6 +69,7 @@ do ->
       # API challenges the request's assertion
       assertion = challenge request
     catch e
+      console.error e
       assert.fail "challenge should have passed."
 
     # The request passes this challenge and is internally consistent.
