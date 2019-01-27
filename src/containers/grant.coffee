@@ -32,7 +32,8 @@ Container = (library, confidential) ->
       privateKey = PrivateKey.from "base64", @use[0]
 
       sign publicKey, privateKey,
-        Plaintext.from "utf8", toJSON {parameters, @declaration}
+        Plaintext.from "utf8",
+          toJSON {parameters, issuerDeclaration:@declaration}
 
     @from: (hint, value) ->
       grant = ifValid do ->

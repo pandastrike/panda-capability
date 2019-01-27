@@ -11,6 +11,9 @@ Container = (library, confidential) ->
   toBase64 = (bytes) -> convert from:"bytes", to:"base64", bytes
   toUTF8 = (bytes) -> convert from:"bytes", to:"utf8", bytes
 
+  extractKeys = ({signatories}) -> toBase64 key for key in signatories
+  extractDocument = ({data}) -> fromJSON toUTF8 data
+
   _from = Method.create default: (args...) ->
     throw new Error "panda-capability::Assertion::from -
       no matches on #{toJSON args}"
@@ -27,17 +30,14 @@ Container = (library, confidential) ->
 
     to: (hint) -> @declaration.to hint
 
-    # Validates the internal consistency of the assertion,
-    # while also adding unpacked properties
+    # Validates internal consistency of assertion; adds unpacked properties
     verify: ->
-      {signatories, data} = @declaration
+      [useKey, clientKey] = extractKeys @declaration
+      {@parameters, issuerDeclaration} = extractDocument @declaration
 
-      [useKey, clientKey] = (toBase64 key for key in signatories)
-
-      {@parameters, declaration} = fromJSON toUTF8 data
-      issuerDeclaration = Declaration.from "base64", declaration
-      @capability = fromJSON toUTF8 issuerDeclaration.data
-      issuerKey = toBase64 issuerDeclaration.signatories[0]
+      issuerDeclaration = Declaration.from "base64", issuerDeclaration
+      @capability = extractDocument issuerDeclaration
+      [issuerKey] = extractKeys issuerDeclaration
 
       @publicKeys = {useKey, clientKey, issuerKey}
 
