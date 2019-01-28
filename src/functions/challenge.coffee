@@ -2,36 +2,31 @@ import {isString, toJSON} from "panda-parchment"
 import {Method} from "panda-generics"
 import T from "url-template"
 
-check = (predicate, message) ->
+assert = (predicate, message) ->
   throw new Error "challenge failure: #{message}" unless predicate
 
 parse = (string) ->
-  check (isString string), "header value must be a string"
+  assert (isString string), "header value must be a string"
   start = string.indexOf " "
   scheme = string[0...start]
-  check scheme == "X-Capability", "invalid scheme #{scheme}"
+  assert scheme == "X-Capability", "invalid scheme #{scheme}"
   string[start...].trim()
-
 
 Challenge = (library, confidential) ->
   {Assertion} = library
-  {verify, Declaration, PublicKey} = confidential
 
   (request) ->
-    check request?.headers?.authorization?, "authorization header not set"
+    results = Assertion.from "base64", parse request?.headers?.authorization
+    .verify()
 
-    assertion = Assertion.from "base64", parse request.headers.authorization
-    check assertion.verify(), "invalid grant assertion"
-
-    {parameters, capability} = assertion
-    {template, methods} = capability
-    {url, method, headers} = request
+    {parameters, capability:{template, methods}} = results
+    {url, method} = request
 
     claimedURL = T.parse(template).expand parameters.url ? {}
 
-    check url == claimedURL, "url does not match capability"
-    check method in methods, "HTTP method does not match capability"
+    assert url == claimedURL, "url does not match capability"
+    assert method in methods, "HTTP method does not match capability"
 
-    assertion
+    results
 
 export default Challenge

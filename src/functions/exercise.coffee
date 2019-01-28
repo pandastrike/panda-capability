@@ -12,7 +12,8 @@ Exercise = (library, confidential) ->
   Method.define exercise,
     Grant.isType, PublicKey.isType, PrivateKey.isType, isObject,
     (grant, publicKey, privateKey, parameters) ->
-      Assertion.from sign publicKey, privateKey, grant.exercise parameters
+      Assertion.create sign publicKey, privateKey,
+        grant.exercise parameters
 
   Method.define exercise,
     Grant.isType, PrivateKey.isType, PublicKey.isType, isObject,

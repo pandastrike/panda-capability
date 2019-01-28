@@ -34,7 +34,6 @@ do ->
     # Serialize the portfolio for transport to alice.
     serializedPortfolio = portfolio.to "utf8"
 
-
     #======================================
 
 
@@ -67,7 +66,7 @@ do ->
     # Back over in the API, it recieves the request from alice
     try
       # API challenges the request's assertion
-      assertion = challenge request
+      results = challenge request
     catch e
       console.error e
       assert.fail "challenge should have passed."
@@ -79,14 +78,11 @@ do ->
 
     # For now, the API compares the assertion's keys against its copy of
     # alice's portfolio.
+    {capability, useKey, clientKey, issuerKey} = results
+
     apiKey = APIKeyPair.publicKey.to "base64"
-
-    {publicKeys, capability} = assertion
-    {useKey, clientKey, issuerKey} = publicKeys
-
     portfolio = Portfolio.from "utf8", serializedPortfolio
-    grant = portfolio[capability.template][request.method]
-    {capability:{use, recipient}} = grant
+    {use, recipient} = portfolio[capability.template][request.method].capability
 
     assert.equal issuerKey, apiKey, "issuer key does not match"
     assert.equal useKey, use[0], "use key does not match"

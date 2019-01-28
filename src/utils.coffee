@@ -1,6 +1,5 @@
 import {isString, isArray, empty} from "panda-parchment"
 
-allowedMethods = ["HEAD", "OPTIONS", "GET", "PUT", "PATCH", "POST", "DELETE"]
 allAllowedMethods = (methods) ->
   return false unless isArray methods
   return false if empty methods
