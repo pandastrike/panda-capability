@@ -16,7 +16,7 @@ Challenge = (library, confidential) ->
   {Assertion} = library
 
   (request) ->
-    results = Assertion.from "base64", parse request?.headers?.authorization
+    assertion = Assertion.from "base64", parse request?.headers?.authorization
     .verify()
 
     {parameters, capability:{template, methods}} = results
@@ -27,6 +27,6 @@ Challenge = (library, confidential) ->
     assert url == claimedURL, "url does not match capability"
     assert method in methods, "HTTP method does not match capability"
 
-    results
+    assertion
 
 export default Challenge

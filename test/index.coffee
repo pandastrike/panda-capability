@@ -7,8 +7,8 @@ import PandaCapability from "../src"
 do ->
   await print await test "Panda Capability", ->
     Confidential = confidential()
-    {SignatureKeyPair} = Confidential
-    {issue, Portfolio, exercise, challenge} = PandaCapability Confidential
+    {SignatureKeyPair, PrivateKey} = Confidential
+    {issue, Directory, exercise, challenge} = PandaCapability Confidential
 
     # The API has its own signature key pair for issuing capabilites to people
     APIKeyPair = await SignatureKeyPair.create()
@@ -22,8 +22,8 @@ do ->
     #==========================================
 
     # API creates a profile for Alice and
-    # issues a portfolio of granted capabilities for her resources.
-    portfolio = await issue APIKeyPair, alice, [
+    # issues a directory of granted capabilities for her resources.
+    directory = await issue APIKeyPair, alice, [
         template: "/profiles/alice/dashes"
         methods: ["OPTIONS", "POST"]
       ,
@@ -31,28 +31,28 @@ do ->
         methods: ["OPTIONS", "GET", "PUT"]
     ]
 
-    # Serialize the portfolio for transport to alice.
-    serializedPortfolio = portfolio.to "utf8"
+    # Serialize the directory for transport to alice.
+    serializedDirectory = directory.to "utf8"
 
     #======================================
 
 
     # Later, when the alice wants to excercise one of the capabilities in
-    # her portfolio by creating a new dash.
+    # her directory by creating a new dash.
 
-    # alice hydrates her portfolio from serialized storage
-    portfolio = Portfolio.from "utf8", serializedPortfolio
+    # alice hydrates her directory from serialized storage
+    directory = Directory.from "utf8", serializedDirectory
 
     # alice grabs relevant grant.
     # (Template could come from panda-sky-client)
-    grant = portfolio["/profiles/alice/dashes"]["POST"]
+    {grant, privateUse} = directory["/profiles/alice/dashes"]["POST"]
 
     # alice specifies the parameters for the template; none for this request.
     parameters = {}
 
     # alice exercises her capability to populate the AUTHORIZATION header.
     # yields an assertion.
-    assertion = exercise grant, Alice, parameters
+    assertion = grant.exercise Alice, privateUse[0], parameters
     request =
       url: "/profiles/alice/dashes"
       method: "POST"
@@ -66,7 +66,7 @@ do ->
     # Back over in the API, it recieves the request from alice
     try
       # API challenges the request's assertion
-      results = challenge request
+      assertion = challenge request
     catch e
       console.error e
       assert.fail "challenge should have passed."
@@ -77,12 +77,12 @@ do ->
     # The API is responsible for a revocation check on those keys
 
     # For now, the API compares the assertion's keys against its copy of
-    # alice's portfolio.
-    {capability, useKey, clientKey, issuerKey} = results
+    # alice's directory.
+    {capability, useKey, clientKey, issuerKey} = assertion
 
     apiKey = APIKeyPair.publicKey.to "base64"
-    portfolio = Portfolio.from "utf8", serializedPortfolio
-    {use, recipient} = portfolio[capability.template][request.method].capability
+    directory = Directory.from "utf8", serializedDirectory
+    {use, recipient} = directory[capability.template][request.method].capability
 
     assert.equal issuerKey, apiKey, "issuer key does not match"
     assert.equal useKey, use[0], "use key does not match"
