@@ -5,7 +5,6 @@ Exercise = (library, confidential) ->
   {Assertion, Grant} = library
   {SignatureKeyPair, sign, Message} = confidential
 
-  # Multiple signing key permutations are provided as convenience.
   exercise = Method.create default: (args...) ->
     throw new Error "panda-capability::exercise -
       no matches on #{toJSON args}"
@@ -14,18 +13,11 @@ Exercise = (library, confidential) ->
     SignatureKeyPair.isType, isArray, Grant.isType, isObject,
     (clientKeyPair, useKeyPairs, grant, parameters) ->
 
-      # Sign first with use key pair
-      declaration = sign useKeyPairs[0],
+      # Sign first with use key pair, then the client key pair.
+      Assertion.create sign [useKeyPairs[0], clientKeyPair],
         Message.from "utf8", toJSON
           grant: grant.to "base64"
           parameters: parameters
-
-      # Then sign with the client key pair
-      declaration = sign clientKeyPair, declaration
-
-      # Output an assertion instance of this grant exercise
-      Assertion.create declaration
-
 
   exercise
 
