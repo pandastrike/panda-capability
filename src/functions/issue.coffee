@@ -2,7 +2,7 @@ import {toJSON, isArray} from "panda-parchment"
 import {Method} from "panda-generics"
 
 Issue = (library, confidential) ->
-  {Directory, Grant} = library
+  {Directory, Seal, Grant} = library
   {SignatureKeyPair, sign, Message, PublicKey} = confidential
 
   issue = Method.create default: (args...) ->
@@ -12,18 +12,23 @@ Issue = (library, confidential) ->
     (issuerKeyPair, recipient, capabilities) ->
       directory = {}
       for capability in capabilities
-        capability.recipient = recipient.to "base64"
-        {publicKey, privateKey} = await SignatureKeyPair.create()
-        capability.publicUse = [ publicKey.to "base64" ]
+        # Create the use key pair for this seal.
+        useKeyPair = await SignatureKeyPair.create()
 
+        capability.recipient = recipient.to "base64"
+        capability.publicUseKeys = [ useKeyPair.publicKey.to "base64" ]
+
+        # Sign the populated capability to issue a grant.
         declaration = sign issuerKeyPair,
           Message.from "utf8", toJSON capability
 
-        directory[capability.template] = {}
-        for method in capability.methods
-          directory[capability.template][method] =
+        # Assign a seal, with a copy of this grant, for every method.
+        {template, methods} = capability
+        directory[template] = {}
+        for method in methods
+          directory[template][method] =
             grant: Grant.create declaration
-            privateUse: [ privateKey ]
+            useKeyPairs: [ useKeyPair ]
 
       Directory.create directory
 

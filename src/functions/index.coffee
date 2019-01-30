@@ -1,11 +1,14 @@
 import {include} from "panda-parchment"
-import _issue from "./issue"
-import _challenge from "./challenge"
+import challenge from "./challenge"
+import exercise from "./exercise"
+import issue from "./issue"
+import parse from "./parse"
+
 
 Functions = (library, confidential) ->
-  issue = _issue library, confidential
-  challenge = _challenge library, confidential
-
-  include library, {issue, challenge}
+  include library, challenge: challenge library, confidential
+  include library, exercise: exercise library, confidential
+  include library, issue: issue library, confidential
+  include library, parse: parse library, confidential
 
 export default Functions

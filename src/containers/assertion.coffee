@@ -14,23 +14,22 @@ Container = (library, confidential) ->
       @publicKeys = {use, client}
 
       {@parameters, grant} = @declaration.message.json()
-      grant = Declaration.from "base64", grant
+      @grant = Declaration.from "base64", grant
 
       # Unpack grant
-      @publicKeys.issuer = first grant.signatories.list "base64"
-      @capability = grant.message.json()
+      @publicKeys.issuer = first @grant.signatories.list "base64"
+      @capability = @grant.message.json()
 
     to: (hint) -> @declaration.to hint
 
-    # Validates internal consistency of assertion; adds unpacked properties
+    # Validates internal consistency of assertion.
     verify: ->
-      assert (verify @declaration),
-        "client signature is invalid"
-      assert (verify grant),
-        "issuer signature is invalid"
+      assert (verify @declaration), "invalid client signature"
+      assert (verify @grant), "invalid issuer signature"
+
       assert @publicKeys.use? && @publicKeys.client?,
         "client or use public key is not present"
-      assert @capability.publicUse[0] == @publicKeys.use,
+      assert @capability.publicUseKeys[0] == @publicKeys.use,
         "public use key is invalid"
       assert @capability.recipient == @publicKeys.client,
         "client key is invalid"

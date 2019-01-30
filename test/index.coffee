@@ -8,7 +8,8 @@ do ->
   await print await test "Panda Capability", ->
     Confidential = confidential()
     {SignatureKeyPair, PrivateKey} = Confidential
-    {issue, Directory, exercise, challenge} = PandaCapability Confidential
+    {issue, Directory, prime, exercise, parse, challenge} =
+      PandaCapability Confidential
 
     # The API has its own signature key pair for issuing capabilites to people
     APIKeyPair = await SignatureKeyPair.create()
@@ -31,8 +32,9 @@ do ->
         methods: ["OPTIONS", "GET", "PUT"]
     ]
 
-    # Serialize the directory for transport to alice.
+    # API serializes the directory for transport to alice.
     serializedDirectory = directory.to "utf8"
+
 
     #======================================
 
@@ -43,16 +45,15 @@ do ->
     # alice hydrates her directory from serialized storage
     directory = Directory.from "utf8", serializedDirectory
 
-    # alice grabs relevant grant.
-    # (Template could come from panda-sky-client)
-    {grant, privateUse} = directory["/profiles/alice/dashes"]["POST"]
+    # alice looks up the relevant grant matching the capability she wants
+    # to exercise. (Template could come from panda-sky-client)
+    {grant, useKeyPairs} = directory["/profiles/alice/dashes"]["POST"]
 
-    # alice specifies the parameters for the template; none for this request.
+    # alice specifies the parameters for the grant; none for this request.
     parameters = {}
 
-    # alice exercises her capability to populate the AUTHORIZATION header.
-    # yields an assertion.
-    assertion = grant.exercise Alice, privateUse[0], parameters
+    # alice exercises the seal and populates the AUTHORIZATION header.
+    assertion = exercise Alice, useKeyPairs, grant, parameters
     request =
       url: "/profiles/alice/dashes"
       method: "POST"
@@ -66,11 +67,15 @@ do ->
     # Back over in the API, it recieves the request from alice
     try
       # API challenges the request's assertion
-      assertion = challenge request
+      assertion = parse request
+      challenge request, assertion
     catch e
       console.error e
       assert.fail "challenge should have passed."
 
+    #========================================
+    # Revocation Check
+    #
     # The request passes this challenge and is internally consistent.
     # The API gets back an instaciated assertion of that passed, including
     # a dictionary of public signing keys used in its construction.
@@ -78,12 +83,15 @@ do ->
 
     # For now, the API compares the assertion's keys against its copy of
     # alice's directory.
-    {capability, useKey, clientKey, issuerKey} = assertion
+    {capability, publicKeys} = assertion
 
     apiKey = APIKeyPair.publicKey.to "base64"
     directory = Directory.from "utf8", serializedDirectory
-    {use, recipient} = directory[capability.template][request.method].capability
+    {publicUseKeys, recipient} = directory[capability.template][request.method]
+      .grant.message
+      .json()
 
-    assert.equal issuerKey, apiKey, "issuer key does not match"
-    assert.equal useKey, use[0], "use key does not match"
-    assert.equal clientKey, recipient, "client key does not match"
+    # Assertion public key vs authoritative source
+    assert.equal publicKeys.issuer, apiKey, "issuer key does not match"
+    assert.equal publicKeys.use, publicUseKeys[0], "use key does not match"
+    assert.equal publicKeys.client, recipient, "client key does not match"

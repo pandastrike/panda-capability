@@ -2,7 +2,7 @@ import {isType, include, toJSON, fromJSON} from "panda-parchment"
 
 Container = (library, confidential) ->
   {Grant} = library
-  {convert, PrivateKey} = confidential
+  {convert, SignatureKeyPair} = confidential
 
   class Directory
     constructor: (directory) -> include @, directory
@@ -11,10 +11,10 @@ Container = (library, confidential) ->
       directory = {}
       for template, methods of @
         directory[template] = {}
-        for method, {grant, privateUse} of methods
+        for method, {grant, useKeyPairs} of methods
           directory[template][method] =
-            grant: grant.to "base64"
-            privateUse: (key.to "base64" for key in privateUse)
+            grant: grant.to "utf8"
+            useKeyPairs: (pair.to "base64" for pair in useKeyPairs)
 
       if hint == "utf8"
         toJSON directory
@@ -25,17 +25,19 @@ Container = (library, confidential) ->
 
     @from: (hint, value) ->
       new Directory do ->
-        directory =
+        directory = do ->
           if hint == "utf8"
             fromJSON value
           else
             fromJSON convert from: hint, to: "utf8", value
 
         for template, methods of directory
-          for method, {grant, privateUse} of methods
+          for method, {grant, useKeyPairs} of methods
             directory[template][method] =
-              grant: Grant.from "base64", grant
-              privateUse: (PrivateKey.from "base64", key for key in privateUse)
+              grant: Grant.from "utf8", grant
+              useKeyPairs:
+                for pair in useKeyPairs
+                  SignatureKeyPair.from "base64", pair
 
         directory
 
