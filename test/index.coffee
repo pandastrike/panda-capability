@@ -8,7 +8,7 @@ do ->
   await print await test "Panda Capability", ->
     Confidential = confidential()
     {SignatureKeyPair, PrivateKey} = Confidential
-    {issue, Directory, prime, exercise, parse, challenge} =
+    {issue, Directory, lookup, exercise, parse, challenge} =
       PandaCapability Confidential
 
     # The API has its own signature key pair for issuing capabilites to people
@@ -45,8 +45,9 @@ do ->
     directory = Directory.from "utf8", serializedDirectory
 
     # alice looks up the relevant grant matching the capability she wants
-    # to exercise. (Template could come from panda-sky-client)
-    {grant, useKeyPairs} = directory["/profiles/alice/dashes"]["POST"]
+    # to exercise. (URL could come from panda-sky-client)
+    methods = lookup directory, "/profiles/alice/dashes"
+    {grant, useKeyPairs} = methods.POST
 
     # alice specifies the parameters for the grant; none for this request.
     parameters = {}
