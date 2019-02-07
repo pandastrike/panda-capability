@@ -1,6 +1,6 @@
 {
   "name": "panda-capability",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Sane Web Capabilities",
   "main": "build/npm/src/index.js",
   "scripts": {
@@ -35,7 +35,7 @@
     "amen": "^2.0.4",
     "panda-9000": "^4.4.0",
     "panda-builder": "^3.2.1",
-    "panda-confidential": "file:../panda-confidential"
+    "panda-confidential": "^2.0.0"
   },
   "dependencies": {
     "panda-generics": "4.2.0",
