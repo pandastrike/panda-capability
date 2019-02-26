@@ -59,6 +59,7 @@ do ->
       method: "POST"
       headers:
         authorization: "X-Capability #{assertion.to "base64"}"
+        date: new Date().toISOString()  # added by Fetch agent automatically.
 
 
     #=======================================
@@ -94,4 +95,4 @@ do ->
     # Assertion public key vs authoritative source
     assert.equal publicKeys.issuer, apiKey, "issuer key does not match"
     assert.equal publicKeys.use, publicUseKeys[0], "use key does not match"
-    assert.equal publicKeys.client, recipient, "client key does not match"
+    assert.equal publicKeys.recipient, recipient, "recipient key does not match"

@@ -11,13 +11,14 @@ Exercise = (library, confidential) ->
 
   Method.define exercise,
     SignatureKeyPair.isType, isArray, Grant.isType, isObject,
-    (clientKeyPair, useKeyPairs, grant, parameters) ->
+    (recipientKeyPair, useKeyPairs, grant, parameters) ->
 
-      # Sign first with use key pair, then the client key pair.
-      Assertion.create sign [useKeyPairs[0], clientKeyPair],
+      # Sign first with use key pair, then the recipient key pair.
+      Assertion.create sign [useKeyPairs[0], recipientKeyPair],
         Message.from "utf8", toJSON
           grant: grant.to "base64"
           parameters: parameters
+          nonce: new Date().toISOString()
 
   exercise
 
