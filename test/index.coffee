@@ -1,7 +1,7 @@
 import assert from "assert"
 import {print, test} from "amen"
 import {confidential} from "panda-confidential"
-import {toJSON} from "panda-parchment"
+import {toJSON, clone} from "panda-parchment"
 import PandaCapability from "../src"
 
 do ->
@@ -61,6 +61,10 @@ do ->
         authorization: "Capability #{assertion.to "base64"}"
         date: new Date().toISOString()  # added by Fetch agent automatically.
 
+    # Alternate request with different cased authorization scheme name.
+    request2 = clone request
+    request2.headers.authorization = "capability #{assertion.to "base64"}"
+
 
     #=======================================
 
@@ -69,6 +73,7 @@ do ->
     try
       # API challenges the request's assertion
       assertion = parse request
+      parse request2  # case insenstivity check
       challenge request, assertion
     catch e
       console.error e
