@@ -1,6 +1,6 @@
 {
   "name": "panda-capability",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Sane Web Capabilities",
   "main": "build/npm/src/index.js",
   "scripts": {

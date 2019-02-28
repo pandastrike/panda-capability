@@ -58,7 +58,7 @@ do ->
       url: "/profiles/alice/dashes"
       method: "POST"
       headers:
-        authorization: "X-Capability #{assertion.to "base64"}"
+        authorization: "Capability #{assertion.to "base64"}"
         date: new Date().toISOString()  # added by Fetch agent automatically.
 
 

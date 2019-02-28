@@ -13,7 +13,7 @@ Parse = (library, confidential) ->
 
     start = header.indexOf " "
     scheme = header[0...start]
-    assert scheme == "X-Capability", "invalid scheme #{scheme}"
+    assert scheme == "Capability", "invalid scheme #{scheme}"
 
     token = header[start...].trim()
 
