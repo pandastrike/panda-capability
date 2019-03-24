@@ -58,4 +58,12 @@ Test = (Confidential, Capability) -> ->
   assert.equal (keys newDirectory).length, (keys directory).length,
     "unexpected directory size"
 
+  # negative tests on self-consitency
+  badIssuer = await SignatureKeyPair.create()
+  try
+    await refresh badIssuer, Alice2.publicKey, publicDirectory
+    assert.fail "should not have refreshed successfully"
+  catch
+
+
 export default Test

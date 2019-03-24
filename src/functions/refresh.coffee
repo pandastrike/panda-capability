@@ -3,7 +3,7 @@ import {Method} from "panda-generics"
 
 Refresh = (library, confidential) ->
   {PublicDirectory, Directory, Grant} = library
-  {SignatureKeyPair, sign, Message, PublicKey} = confidential
+  {SignatureKeyPair, sign, Message, PublicKey, verify} = confidential
 
   refresh = Method.create default: (args...) ->
     throw new Error "panda-capability::refresh no matches on #{toJSON args}"
@@ -12,10 +12,18 @@ Refresh = (library, confidential) ->
     SignatureKeyPair.isType, PublicKey.isType, PublicDirectory.isType,
     (issuerKeyPair, recipient, publicDirectory) ->
       directory = {}
+      issuer = issuerKeyPair.publicKey.to "base64"
 
       for template, methods of publicDirectory
         directory[template] = {}
         for method, {grant} of methods
+          # Validate grant and confirm the issuer key pair was used before.
+          unless grant.verify()
+            throw new Error "invalid grant found at #{template} #{method}"
+          unless issuer in (grant.signatories.list "base64")
+            throw new Error "grant at #{template} #{method} not issued by
+              #{issuer}"
+
           # Pull out the capability from this grant and refresh
           capability = grant.message.json()
           capability.recipient = recipient.to "base64"
