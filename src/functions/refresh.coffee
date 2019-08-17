@@ -1,12 +1,14 @@
 import {toJSON} from "panda-parchment"
-import {Method} from "panda-generics"
+import Method from "panda-generics"
 
 Refresh = (library, confidential) ->
   {PublicDirectory, Directory, Grant} = library
   {SignatureKeyPair, sign, Message, PublicKey, verify} = confidential
 
-  refresh = Method.create default: (args...) ->
-    throw new Error "panda-capability::refresh no matches on #{toJSON args}"
+  refresh = Method.create
+    name: "refresh"
+    description: "Accepts a PublicDirectory, verifies the issuer issued each
+      original grant, and then re-issues a Directory with new use key pairs."
 
   Method.define refresh,
     SignatureKeyPair.isType, PublicKey.isType, PublicDirectory.isType,

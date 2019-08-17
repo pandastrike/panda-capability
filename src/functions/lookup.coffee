@@ -1,12 +1,13 @@
 import {toJSON, isString, isObject} from "panda-parchment"
-import {Method} from "panda-generics"
+import Method from "panda-generics"
 import URLTemplate from "url-template"
 
 Lookup = (library, confidential) ->
   {Directory} = library
 
-  lookup = Method.create default: (args...) ->
-    throw new Error "panda-capability::lookup no matches on #{toJSON args}"
+  lookup = Method.create
+    name: "lookup"
+    description: "Lookup a Grant whose template matches the given URL."
 
   Method.define lookup, Directory.isType, isString, isObject,
     (directory, path, description) ->

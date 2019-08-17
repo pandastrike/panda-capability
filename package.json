@@ -1,6 +1,6 @@
 {
   "name": "panda-capability",
-  "version": "0.2.2",
+  "version": "1.0.0",
   "description": "Sane Web Capabilities",
   "main": "build/npm/src/index.js",
   "scripts": {
@@ -31,15 +31,15 @@
     "url": "https://github.com/pandastrike/panda-capability/issues"
   },
   "homepage": "https://github.com/pandastrike/panda-capability#readme",
-  "devDependencies": {
-    "amen": "^2.0.4",
-    "panda-9000": "^4.4.0",
-    "panda-builder": "^3.2.1",
-    "panda-confidential": "^2.0.0"
-  },
   "dependencies": {
-    "panda-generics": "4.2.0",
-    "panda-parchment": "^4.2.0",
+    "panda-generics": "^6.0.0",
+    "panda-parchment": "^5.0.0",
     "url-template": "^2.0.8"
+  },
+  "devDependencies": {
+    "amen": "^3.0.0",
+    "panda-9000": "^5.0.0",
+    "panda-builder": "^4.0.1",
+    "panda-confidential": "^3.0.0"
   }
 }

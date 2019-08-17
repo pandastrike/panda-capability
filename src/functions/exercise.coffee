@@ -1,13 +1,13 @@
 import {toJSON, isObject, isArray} from "panda-parchment"
-import {Method} from "panda-generics"
+import Method from "panda-generics"
 
 Exercise = (library, confidential) ->
   {Assertion, Grant} = library
   {SignatureKeyPair, sign, Message} = confidential
 
-  exercise = Method.create default: (args...) ->
-    throw new Error "panda-capability::exercise -
-      no matches on #{toJSON args}"
+  exercise = Method.create
+    name: "exercise"
+    description: "Excercises a given Grant to return an Assertion"
 
   Method.define exercise,
     SignatureKeyPair.isType, isArray, Grant.isType, isObject,

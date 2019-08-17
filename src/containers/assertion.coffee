@@ -1,5 +1,4 @@
 import {first, isString, isDefined, isType, toJSON, fromJSON, include} from "panda-parchment"
-import {Method} from "panda-generics"
 
 assert = (predicate, message) ->
   throw new Error "challenge failure: #{message}" unless predicate

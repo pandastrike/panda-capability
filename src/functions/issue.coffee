@@ -1,12 +1,13 @@
 import {toJSON, isArray} from "panda-parchment"
-import {Method} from "panda-generics"
+import Method from "panda-generics"
 
 Issue = (library, confidential) ->
   {Directory, Grant} = library
   {SignatureKeyPair, sign, Message, PublicKey} = confidential
 
-  issue = Method.create default: (args...) ->
-    throw new Error "panda-capability::issue no matches on #{toJSON args}"
+  issue = Method.create
+    name: "issue"
+    description: "Issues a Directory of Grants to a recipient PublicKey."
 
   Method.define issue, SignatureKeyPair.isType, PublicKey.isType, isArray,
     (issuerKeyPair, recipient, capabilities) ->
