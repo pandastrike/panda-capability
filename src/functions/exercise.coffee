@@ -2,19 +2,19 @@ import {toJSON, isObject, isArray} from "panda-parchment"
 import Method from "panda-generics"
 
 Exercise = (library, confidential) ->
-  {Assertion, Grant} = library
+  {Claim, Grant} = library
   {SignatureKeyPair, sign, Message} = confidential
 
   exercise = Method.create
     name: "exercise"
-    description: "Excercises a given Grant to return an Assertion"
+    description: "Excercises a given Grant to return an Claim"
 
   Method.define exercise,
-    SignatureKeyPair.isType, isArray, Grant.isType, isObject,
-    (recipientKeyPair, useKeyPairs, grant, parameters) ->
+    SignatureKeyPair.isType, Grant.isType, isObject,
+    (recipientKeyPair, grant, parameters) ->
 
-      # Sign first with use key pair, then the recipient key pair.
-      Assertion.create sign [useKeyPairs[0], recipientKeyPair],
+      # Sign the grant with the recipient key pair.
+      Claim.create sign recipientKeyPair,
         Message.from "utf8", toJSON
           grant: grant.to "base64"
           parameters: parameters

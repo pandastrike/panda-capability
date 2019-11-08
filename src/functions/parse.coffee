@@ -4,7 +4,7 @@ assert = (predicate, message) ->
   throw new Error "authorization parse failure: #{message}" unless predicate
 
 Parse = (library, confidential) ->
-  {Assertion} = library
+  {Claim} = library
 
   (request) ->
     header = request?.headers?.authorization
@@ -18,7 +18,7 @@ Parse = (library, confidential) ->
 
     token = header[start...].trim()
 
-    Assertion.from "base64", token
+    Claim.from "base64", token
 
 
 export default Parse

@@ -1,9 +1,10 @@
+import "source-map-support/register"
 import {print, test} from "amen"
 import {confidential} from "panda-confidential"
 import PandaCapability from "../src"
 
-import mainline from "./mainline"
-import refresh from "./refresh"
+import standard from "./standard"
+#import memoized from './memoized'
 
 do ->
   Confidential = confidential()
@@ -11,12 +12,7 @@ do ->
 
   await print await test "Panda Capability", [
     test
-      description: "Mainline - Issue, Assert, Challenge"
+      description: "Standard - Issue, Claim, Verify"
       wait: false,
-      mainline Confidential, Capability
-
-    test
-      description: "Refresh Cycle",
-      wait: false,
-      refresh Confidential, Capability
+      standard Confidential, Capability
   ]
