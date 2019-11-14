@@ -13,12 +13,12 @@ Parse = (library, confidential) ->
 
     start = header.indexOf " "
     scheme = header[0...start]
-    assert scheme.match /[cC][aA][pP][aA][bB][iI][lL][iI][tT][yY]/,
-      "invalid scheme #{scheme}"
 
-    token = header[start...].trim()
-
-    Claim.from "base64", token
-
+    if scheme.match /[cC][aA][pP][aA][bB][iI][lL][iI][tT][yY]/
+      Contract.from "base64", header[start...].trim()
+    else if scheme.match /[mM][eE][mM][oO]/
+      Memo.from "base64", header[start...].trim()
+    else
+      throw new Error "unable to match on authorization scheme header."
 
 export default Parse

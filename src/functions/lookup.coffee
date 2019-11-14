@@ -7,7 +7,7 @@ Lookup = (library, confidential) ->
 
   lookup = Method.create
     name: "lookup"
-    description: "Lookup a Grant whose template matches the given URL."
+    description: "Lookup a Contract whose template matches the given URL."
 
   Method.define lookup, Directory.isType, isString, isObject,
     (directory, path, description) ->

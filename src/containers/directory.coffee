@@ -1,7 +1,7 @@
 import {isType, include, toJSON, fromJSON} from "panda-parchment"
 
 Container = (library, confidential) ->
-  {Grant} = library
+  {Contract} = library
   {convert} = confidential
 
   class Directory
@@ -11,8 +11,8 @@ Container = (library, confidential) ->
       directory = {}
       for template, methods of @
         directory[template] = {}
-        for method, grant of methods
-          directory[template][method] = grant.to "utf8"
+        for method, contract of methods
+          directory[template][method] = Contract.to "utf8"
 
       if hint == "utf8"
         toJSON directory
@@ -30,8 +30,8 @@ Container = (library, confidential) ->
             fromJSON convert from: hint, to: "utf8", value
 
         for template, methods of directory
-          for method, grant of methods
-            directory[template][method] = Grant.from "utf8", grant
+          for method, contract of methods
+            directory[template][method] = Contract.from "utf8", contract
 
         directory
 

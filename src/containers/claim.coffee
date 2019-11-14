@@ -4,22 +4,17 @@ assert = (predicate, message) ->
   throw new Error "verify failure: #{message}" unless predicate
 
 Container = (library, confidential) ->
-  {Grant} = library
   {verify, Declaration} = confidential
 
   class Claim
     constructor: (@declaration) ->
       @signatories = @declaration.signatories.list "base64"
 
-      {@parameters, grant, @nonce} = @declaration.message.json()
-      @grant = Grant.from "base64", grant
+      {@template, @method, @timestamp, @claimant} = @declaration.message.json()
 
     to: (hint) -> @declaration.to hint
 
-    # Validates internal consistency of claim.
-    verify: ->
-      assert (verify @declaration), "invalid claim signature"
-      assert @grant.verify(), "invalid grant signature"
+    verify: -> verify @declaration
 
     @create: (value) -> new Claim value
 

@@ -1,35 +1,60 @@
 import URLTemplate from "url-template"
-import {toJSON} from "panda-parchment"
+import Method from "panda-generics"
+import {toJSON, isObject} from "panda-parchment"
 
 assert = (predicate, message) ->
   throw new Error "verify failure: #{message}" unless predicate
 
 Verify = (library, confidential) ->
 
-  (request, claim) ->
-    # Check claim nonce to mitigate replay attacks
-    now = Date.now()
-    tolerance = 30000  # tolerance is +/- 30 seconds
-    nonce = new Date claim.nonce
-    assert (new Date now - tolerance) < nonce < (new Date now + tolerance),
-      "Bad nonce.  Current time is #{new Date().toISOString()}"
+  {Contract, Memo} = library
 
-    # Compare request to claim parameters
+  verify = Method.create
+    name: "verify"
+    description: "Verify a sealed Contract or Memo against a request."
 
-    #= URL
-    url = URLTemplate
-      .parse claim.grant.template
-      .expand claim.parameters.url ? {}
+  Method.define verify, isObject, Contract.isType,
+    (request, contract) ->
 
-    assert request.url == url,
-      "url #{request.url} does not match grant"
+      # Internal consistency checks.
+      contract.verify()
 
-    #= HTTP Method
-    assert request.method in claim.grant.methods,
-      "HTTP method #{request.method} does not match grant"
+      # Compare request URL to contract
+      url = URLTemplate
+        .parse contract.grant.template
+        .expand contract.claim.url
 
-    # Validate the claim's internal consistency via digital signature
-    claim.verify()
+      assert request.url == url,
+        "url does not match grant"
+
+      # Compare request method to contract
+      assert request.method in contract.grant.methods,
+        "HTTP method does not match grant"
+
+      assert request.method == contract.claim.method,
+        "HTTP method does not match claim"
+
+
+  # Method.define verify, isObject, Memo.isType,
+  #   (request, memo) ->
+  #
+  #     # Check claim expiration
+  #     assert new Date().toISOString() < memo.expires,
+  #       "The memo is expired."
+  #
+  #     # Compare request to claim parameters
+  #
+  #     #= URL
+  #     url = URLTemplate
+  #       .parse memo.template
+  #       .expand memo.parameters
+  #
+  #     assert request.url == url,
+  #       "url does not match memo"
+  #
+  #     #= HTTP Method
+  #     assert request.method == method,
+  #       "HTTP method does not match memo"
 
 
 export default Verify

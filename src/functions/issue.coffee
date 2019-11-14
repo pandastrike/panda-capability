@@ -1,4 +1,4 @@
-import {toJSON, isString, isArray} from "panda-parchment"
+import {toJSON, isObject, isArray, merge} from "panda-parchment"
 import Method from "panda-generics"
 import AJV from "ajv"
 import schema from "../schema/capability"
@@ -6,45 +6,36 @@ import schema from "../schema/capability"
 ajv = new AJV()
 
 Issue = (library, confidential) ->
-  {Directory, Grant} = library
+  {Directory, Contract, Grant} = library
   {SignatureKeyPair, sign, Message, PublicKey} = confidential
 
   issue = Method.create
     name: "issue"
-    description: "Issues a Directory of Grants to a recipient PublicKey."
+    description: "Issues a Directory of Contracts to a claimant PublicKey."
 
-  Method.define issue, SignatureKeyPair.isType, isString, isString, isArray,
-    (issuerKeyPair, issuer, recipient, capabilities) ->
+  Method.define issue,
+    SignatureKeyPair.isType, isObject, isArray,
+    (issuerKeyPair, authorities, stubs) ->
       directory = {}
 
-      unless ajv.validate schema, capabilities
-        console.error toJSON ajv.errors, true
-        throw new Error "Unable to issue directory. Capability failed validation."
+      for stub in stubs
+        capability = merge stub, authorities
 
-      for capability in capabilities
-        # Add in key registry URLs where one may confirm key validity.
-        capability.constraints ?= []
-
-        capability.constraints.push
-          type: "web signature"
-          name: "issuer"
-          url: issuer
-
-        capability.constraints.push
-          type: "web signature"
-          name: "recipient"
-          url: recipient
+        unless ajv.validate schema, capability
+          console.error toJSON ajv.errors, true
+          throw new Error "Unable to issue directory. Capability failed validation."
 
         # Sign the populated capability to issue a grant.
         declaration = sign issuerKeyPair,
           Message.from "utf8", toJSON capability
 
-        # Place grant into directory.
+        # Place grant into directory of contracts.
         {template, methods} = capability
 
         directory[template] = {}
         for method in methods
-          directory[template][method] = Grant.create declaration
+          directory[template][method] =
+            Contract.create grant: Grant.create declaration
 
       Directory.create directory
 

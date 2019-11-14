@@ -6,7 +6,7 @@ Container = (library, confidential) ->
   class Grant
     constructor: (@declaration) ->
       {@message, @signatories, @signatures} = @declaration
-      {@template, @methods, @tolerance, @issuer, @claimant} = @message.json()
+      {@template, @methods, @issuer, @claimant} = @message.json()
 
     to: (hint) -> @declaration.to hint
 

@@ -3,18 +3,18 @@ import {isType, isObject, fromJSON, toJSON} from "panda-parchment"
 Container = (library, confidential) ->
   {Declaration, verify} = confidential
 
-  class Grant
+  class Memo
     constructor: (@declaration) ->
       {@message, @signatories, @signatures} = @declaration
-      {@template, @methods, @tolerance, @issuer, @claimant} = @message.json()
+      {@template, @methods, @issuer, @claimant} = @message.json()
 
     to: (hint) -> @declaration.to hint
 
     verify: -> verify @declaration
 
-    @create: (value) -> new Grant value
+    @create: (value) -> new Memo value
 
-    @from: (hint, value) -> new Grant Declaration.from hint, value
+    @from: (hint, value) -> new Memo Declaration.from hint, value
 
     @isType: isType @
 
