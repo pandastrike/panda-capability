@@ -1,10 +1,10 @@
 schema =
   type: "object"
   additionalProperties: false
-  required: ["template", "method", "timestamp", "claimant"]
+  required: ["method", "timestamp", "claimant"]
   properties:
     template:
-      description: "Binds values to the URL template from the grant. Values are listed in a dictionary with parameter names."
+      description: "Optional. Binds values to the URL template from the grant. Values are listed in a dictionary with parameter names."
       type: "object"
     method:
       description: "Binds the HTTP method the claimant wishes to execute."

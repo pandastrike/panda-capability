@@ -10,7 +10,8 @@ Container = (library, confidential) ->
     constructor: (@declaration) ->
       @signatories = @declaration.signatories.list "base64"
 
-      {@template, @method, @timestamp, @claimant} = @declaration.message.json()
+      {@template={}, @method, @timestamp,
+        @claimant} = @declaration.message.json()
 
     to: (hint) -> @declaration.to hint
 

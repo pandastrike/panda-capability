@@ -1,6 +1,6 @@
 import URLTemplate from "url-template"
 import Method from "panda-generics"
-import {toJSON, isObject} from "panda-parchment"
+import {toJSON, isObject, isEmpty} from "panda-parchment"
 
 assert = (predicate, message) ->
   throw new Error "verify failure: #{message}" unless predicate
@@ -17,18 +17,18 @@ Verify = (library, confidential) ->
     (request, contract) ->
 
       # Internal consistency checks.
-      contract.verify()
+      {parameters, methods} = contract.verify()
 
       # Compare request URL to contract
       url = URLTemplate
         .parse contract.grant.template
-        .expand contract.claim.url
+        .expand parameters
 
       assert request.url == url,
         "url does not match grant"
 
       # Compare request method to contract
-      assert request.method in contract.grant.methods,
+      assert request.method in methods,
         "HTTP method does not match grant"
 
       assert request.method == contract.claim.method,

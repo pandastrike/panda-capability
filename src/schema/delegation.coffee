@@ -1,14 +1,14 @@
 schema =
   type: "object"
   additionalProperties: false
-  required: ["grant", "methods", "claimant", "delegate"]
+  required: ["integrity", "methods", "claimant", "delegate"]
   properties:
-    grant:
-      description: "The SHA-512 hash of the stringified grant from this contract. The hash is given as a base64 string. This affirms the association of the delegation to this contract."
+    integrity:
+      description: "The SHA-512 hash of the stringified grant and any previous delegations, affirming the association of the delegation with this contract. The hash is given as a base64 string."
       type: "string"
 
     template:
-      description: "Optional.  When a claimant delegates a fixed URL, rather than a more permissive URL template, they may narrow the original grant by binding URL template parameters here. Specified as a dictionary of parameter names and values. Partial binding is not allowed."
+      description: "Optional.  When a claimant delegates a fixed URL, rather than a more permissive URL template, they may narrow the original grant by binding URL template parameters here. Specified as a dictionary of parameter names and values. Partial binding is not allowed. Therefore, this can only be bound once and all later delegations must abide by the resultant URL."
       type: "object"
 
     methods:

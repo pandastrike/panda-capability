@@ -23,7 +23,7 @@ Issue = (library, confidential) ->
 
         unless ajv.validate schema, capability
           console.error toJSON ajv.errors, true
-          throw new Error "Unable to issue directory. Capability failed validation."
+          throw new Error "Capability failed validation."
 
         # Sign the populated capability to issue a grant.
         declaration = sign issuerKeyPair,

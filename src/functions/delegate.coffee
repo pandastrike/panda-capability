@@ -1,4 +1,4 @@
-import {toJSON, isObject, merge} from "panda-parchment"
+import {toJSON, isObject, merge, isEmpty, last, keys} from "panda-parchment"
 import Method from "panda-generics"
 import AJV from "ajv"
 import schema from "../schema/delegation"
@@ -7,7 +7,7 @@ ajv = new AJV()
 
 Delegate = (library, confidential) ->
   {Delegation, Contract} = library
-  {SignatureKeyPair, sign, Message} = confidential
+  {SignatureKeyPair, sign, Message, hash} = confidential
 
   delegate = Method.create
     name: "delegate"
@@ -19,9 +19,27 @@ Delegate = (library, confidential) ->
 
       contract = Contract.create contract
 
+      delegation.integrity = hash Message.from "utf8", toJSON
+        grant: contract.grant.to "utf8"
+        delegations: (d.to "utf8" for d in contract.delegations)
+      .to "base64"
+
       unless ajv.validate schema, delegation
         console.error toJSON ajv.errors, true
-        throw new Error "Unable to delegate grant. Claim failed validation."
+        throw new Error "Delegation description failed validation."
+
+      if delegation.template?
+        for d in contract.delegations
+          if d.template?
+            throw new Error "Cannot rebind grant URL template."
+
+      for method in delegation.methods
+        if !isEmpty contract.delegations
+          unless method in (last contract.delegations).methods
+            throw new Error "Delegatation method is beyond granted scope."
+        else
+          unless method in contract.grant.methods
+            throw new Error "Delegatation method is beyond granted scope."
 
       # Add a claim to the contract including the claimant's countersignature.
       contract.delegations.push Delegation.create sign claimantKeyPair,
@@ -29,6 +47,18 @@ Delegate = (library, confidential) ->
 
       contract
 
+  Method.define delegate,
+    SignatureKeyPair.isType, SignatureKeyPair.isType, Contract.isType, isObject,
+    (claimantKeyPair, revocationKeyPair contract, delegation}) ->
+
+      contract = delegate claimantKeyPair, contract, delegation
+
+      unless delegation.revocation?
+        throw new Error "revocation key pair specified without corresponding authority in delegation description."
+
+      sign revocationKeyPair, last contract.delegations
+
+      contract
 
   delegate
 
