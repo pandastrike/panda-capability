@@ -1,11 +1,52 @@
-import {isType, isObject, fromJSON, toJSON, isEmpty, last} from "panda-parchment"
+import {isType, isObject, fromJSON, toJSON,
+  isEmpty, last} from "panda-parchment"
+import _fetch from "node-fetch"
+import URLTemplate from "url-template"
+
 
 assert = (predicate, message) ->
   throw new Error "verify failure: #{message}" unless predicate
 
+compare = (signatory, key) ->
+  assert signatory == key, "unsatisfied authority"
+
+fetch = (url) ->
+  response = await _fetch url
+    method: "GET"
+    redirect: "follow"
+    follow: 20
+
+  if response.status == 200
+    await response.text()
+  else
+    throw new Error "key authority fetch failed with status #{response.status}"
+
+# source authority is A1, destination authority is A2.
+# (issuer / delegator)    (claimant, delegate)
+# A2 is only for the case of authorities that use URL templates because that's a forward-referencing constraint bound and satisfied during delegation/claiming.
+checkAuthority = (signatory, A1, A2) ->
+  if A1.literal?
+    compare signatory, A1.literal
+  else if A1.url?
+    compare signatory, await fetch A1.url
+  else if A1.template?
+    assert A2.template?, "unsatisfied authority"
+
+    url = URLTemplate
+      .parse A1.template  # URL template
+      .expand A2.template # bound parameters
+
+    compare signatory, await fetch url
+  else
+    throw new Error "malformed authority description"
+
 Container = (library, confidential) ->
   {Grant, Delegation, Claim} = library
-  {Declaration, verify} = confidential
+  {Declaration, verify, Message, hash} = confidential
+
+  integrityHash = (object) ->
+    hash Message.from "utf8", toJSON object
+    .to "base64"
 
   class Contract
     constructor: ({@grant, @delegations, @claim}) ->
@@ -23,19 +64,78 @@ Container = (library, confidential) ->
           convert from: "utf8", to: hint, toJSON contract
 
     verify: ->
+      authorityLookupPromise = @verifyAuthorities()
+
+      @verifyExpiration()
       @verifySignatures()
+      @verifyDelegationIntegrity()
       @verifyTolerance()
       parameters = @verifyTemplate()
       methods = @verifyMethods()
 
+      await authorityLookupPromise
+
       {parameters, methods}
+
+    verifyAuthorities: ->
+      # Start with grant.
+      assert @grant.signatories.length == (1 + @grant.revocations.length),
+        "unsatisfied authority"
+
+      await checkAuthority @grant.signatories[0], @grant.issuer
+
+      for authority, i in @grant.revocations
+        await checkAuthority @grant.signatories[i + 1], authority
+
+
+      # Walk through the delegation chain.
+      claimant = @grant.claimant
+
+      for d in @delegations
+        assert d.signatories.length == (1 + d.revocations.length),
+          "unsatisfied authority"
+
+        await checkAuthority d.signatories[0], claimant, d.claimant
+
+        for authority, i in d.revocations
+          await checkAuthority d.signatories[i + 1], authority
+
+        # If delegation is valid, the delegate becomes the new claimant
+        claimant = d.delegate
+
+      # And lastly, the claim.
+      assert @claim.signatories.length == 1, "unsatisfied authority"
+      await checkAuthority @claim.signatories[0], claimant, @claim.claimant
+
+
+    verifyExpiration: ->
+      now = new Date().toISOString()
+
+      if @grant.expires?
+        assert (@grant.expires < now), "grant is expired."
+
+      for delegation in @delegations
+        if delegation.expires?
+          assert (delegation.expires < now), "delegation is expired"
 
     verifySignatures: ->
       assert @grant?.verify(), "invalid grant signature"
       assert @claim?.verify(), "invalid claim signature"
 
+      # Does not validate delegation chain, only individual self-consistency.
       for delegation in contract.delegations
         assert delegation.verify(), "invalid delegation signature"
+
+    verifyDelegationIntegrity: ->
+      comparisonObject =
+        grant: @grant.to "utf8"
+        delegations: []
+
+      for delegation in @delegations
+        if delegation.integrity == integrityHash comparisonObject
+          comparisonObject.delegations.push delegation.to "utf8"
+        else
+          throw new Error "invalid delegation chain integrity"
 
     verifyToleranceCheck: ->
       {tolerance} = @grant
@@ -72,7 +172,7 @@ Container = (library, confidential) ->
 
       parameters
 
-    # Allowed HTTP methods are specified in the grant and possibly narrowed in  delegation. This returns the array of ultimately allowed
+    # Allowed HTTP methods are specified in the grant and possibly narrowed in  delegation. This returns the array of ultimately allowed methods
     verifyMethods: ->
       methods = @grant.methods
 
@@ -83,7 +183,7 @@ Container = (library, confidential) ->
           if method in methods
             _methods.push method
           else
-            throw new Error "Invalid delegatation. Method is beyond scope."
+            throw new Error "Invalid delegation. Method is beyond scope."
 
         methods = _methods
 

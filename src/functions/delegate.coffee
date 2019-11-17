@@ -48,15 +48,19 @@ Delegate = (library, confidential) ->
       contract
 
   Method.define delegate,
-    SignatureKeyPair.isType, SignatureKeyPair.isType, Contract.isType, isObject,
-    (claimantKeyPair, revocationKeyPair contract, delegation}) ->
+    SignatureKeyPair.isType,
+    SignatureKeyPair.areType,
+    Contract.isType,
+    isObject,
+    (claimantKeyPair, revocationArray, contract, delegation}) ->
 
       contract = delegate claimantKeyPair, contract, delegation
 
-      unless delegation.revocation?
-        throw new Error "revocation key pair specified without corresponding authority in delegation description."
+      unless revocationArray.length == delegation.revocations.length
+        throw new Error "mismatch in number of revocation key pairs and authority definitions"
 
-      sign revocationKeyPair, last contract.delegations
+      for keyPair in revocationArray
+        sign keyPair, last contract.delegations
 
       contract
 

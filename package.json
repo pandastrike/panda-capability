@@ -33,6 +33,7 @@
   "homepage": "https://github.com/pandastrike/panda-capability#readme",
   "dependencies": {
     "ajv": "^6.10.2",
+    "node-fetch": "^2.6.0",
     "panda-generics": "^6.0.0",
     "panda-parchment": "^6.0.1",
     "url-template": "^2.0.8"

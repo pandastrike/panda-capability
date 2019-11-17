@@ -8,7 +8,9 @@ Container = (library, confidential) ->
       @signatories = @declaration.signatories.list "base64"
 
       {@message} = @declaration
-      {@template, @methods, @tolerance, @issuer, @claimant} = @message.json()
+      {@template, @methods,
+        @expires, @tolerance,
+        @issuer, @revocations=[], @claimant} = @message.json()
 
     to: (hint) -> @declaration.to hint
 

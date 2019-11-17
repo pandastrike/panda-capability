@@ -17,7 +17,7 @@ Verify = (library, confidential) ->
     (request, contract) ->
 
       # Internal consistency checks.
-      {parameters, methods} = contract.verify()
+      {parameters, methods} = await contract.verify()
 
       # Compare request URL to contract
       url = URLTemplate
