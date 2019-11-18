@@ -2,7 +2,6 @@ import {isType, areType, fromJSON, toJSON, isEmpty, last} from "panda-parchment"
 import _fetch from "node-fetch"
 import URLTemplate from "url-template"
 
-
 assert = (predicate, message) ->
   throw new Error "verify failure: #{message}" unless predicate
 
@@ -43,13 +42,10 @@ Container = (library, confidential) ->
   {Grant, Delegation, Claim} = library
   {Declaration, verify, Message, hash} = confidential
 
-  integrityHash = (object) ->
-    hash Message.from "utf8", toJSON object
-    .to "base64"
-
   class Contract
     constructor: ({@grant, @delegations, @claim}) ->
       @delegations ?= []
+      @validate()
 
     to: (hint) ->
       contract =
@@ -126,13 +122,11 @@ Container = (library, confidential) ->
         assert delegation.verify(), "invalid delegation signature"
 
     verifyDelegationIntegrity: ->
-      comparisonObject =
-        grant: @grant.to "utf8"
-        delegations: []
+      reference = {@grant, delegations: []}
 
       for delegation in @delegations
-        if delegation.integrity == integrityHash comparisonObject
-          comparisonObject.delegations.push delegation.to "utf8"
+        if delegation.integrity == Delegation.integrityHash reference
+          reference.delegations.push delegation
         else
           throw new Error "invalid delegation chain integrity"
 
@@ -187,6 +181,16 @@ Container = (library, confidential) ->
         methods = _methods
 
       methods
+
+    validate: ->
+      unless Grant.isType @grant
+        throw new Error "Invalid contract: grant failed validation."
+
+      unless Delegation.areType @delegations
+        throw new Error "Invalid contract: delegation(s) failed validation."
+
+      if @claim? && !Claim.isType @claim
+        throw new Error "Invalid contract: claim failed validation."
 
     @create: (value) -> new Contract value
 

@@ -1,11 +1,13 @@
-import {isType, include, toJSON, fromJSON} from "panda-parchment"
+import {isType, include, toJSON, fromJSON, values} from "panda-parchment"
 
 Container = (library, confidential) ->
   {Contract} = library
   {convert} = confidential
 
   class Directory
-    constructor: (directory) -> include @, directory
+    constructor: (directory) ->
+      include @, directory
+      @validate()
 
     to: (hint) ->
       directory = {}
@@ -18,6 +20,11 @@ Container = (library, confidential) ->
         toJSON directory
       else
         convert from: "utf8", to: hint, toJSON directory
+
+    validate: ->
+      for template, methods of @
+        unless Contract.areType values methods
+          throw new Error "Invalid directory: contract failed validation."
 
     @create: (value) -> new Directory value
 

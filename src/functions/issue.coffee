@@ -1,12 +1,8 @@
-import {toJSON, isObject, isArray, merge} from "panda-parchment"
+import {toJSON, isObject} from "panda-parchment"
 import Method from "panda-generics"
-import AJV from "ajv"
-import schema from "../schema/capability"
-
-ajv = new AJV()
 
 Issue = (library, confidential) ->
-  {Directory, Contract, Grant} = library
+  {Contract, Grant} = library
   {SignatureKeyPair, sign, Message} = confidential
 
   issue = Method.create
@@ -17,10 +13,6 @@ Issue = (library, confidential) ->
     SignatureKeyPair.isType, isObject,
     (issuerKeyPair, capability) ->
 
-      unless ajv.validate schema, capability
-        console.error toJSON ajv.errors, true
-        throw new Error "Capability failed validation."
-
       # Sign the populated capability to issue a grant.
       Contract.create
         grant: Grant.create sign issuerKeyPair,
@@ -28,7 +20,7 @@ Issue = (library, confidential) ->
 
 
   Method.define issue,
-    SignatureKeyPair.isType, SignatureKeyPair.areType, isObject, isArray,
+    SignatureKeyPair.isType, SignatureKeyPair.areType, isObject,
     (issuerKeyPair, revocationArray, capability) ->
 
       contract = issue issuerKeyPair, capability

@@ -1,9 +1,5 @@
 import {toJSON, isString, isObject, merge} from "panda-parchment"
 import Method from "panda-generics"
-import AJV from "ajv"
-import schema from "../schema/memo"
-
-ajv = new AJV()
 
 Memoize = (library, confidential) ->
   {Memo} = library
@@ -17,17 +13,12 @@ Memoize = (library, confidential) ->
     isString, isObject,
     (secret, content) ->
 
+      # Link the content to an issuer-held secret with an integrity hash
       integrity = hash Message.from "utf8", toJSON merge {secret}, content
       .to "base64"
 
-      memo = {integrity, content}
-
-      unless ajv.validate schema, memo
-        console.error toJSON ajv.errors, true
-        throw new Error "Memo failed validation."
-
-      # Sign the populated capability to issue a grant.
-      Memo.create memo
+      # Issue memo
+      Memo.create {integrity, content}
 
   memoize
 
