@@ -5,7 +5,7 @@ schema =
   properties:
 
     template:
-      description: "The URL template that describes the family of resources this capability grants to the claimant."
+      description: "The URL template that describes the resources this capability grants to the claimant."
       type: "string"
       format: "uri-template"
 

@@ -35,26 +35,26 @@ Verify = (library, confidential) ->
         "HTTP method does not match claim"
 
 
-  # Method.define verify, isObject, Memo.isType,
-  #   (request, memo) ->
-  #
-  #     # Check claim expiration
-  #     assert new Date().toISOString() < memo.expires,
-  #       "The memo is expired."
-  #
-  #     # Compare request to claim parameters
-  #
-  #     #= URL
-  #     url = URLTemplate
-  #       .parse memo.template
-  #       .expand memo.parameters
-  #
-  #     assert request.url == url,
-  #       "url does not match memo"
-  #
-  #     #= HTTP Method
-  #     assert request.method == method,
-  #       "HTTP method does not match memo"
+  Method.define verify, isObject, Memo.isType, isString
+    (request, memo, secret) ->
+
+      # Internal consistency checks.
+      memo.verify secret
+
+      # Compare request URL to memo.
+      if (template = memo.content.resource.template)?
+        url = URLTemplate
+          .parse template
+          .expand memo.claim.template ? {}
+      else
+        url = memo.content.resource.url
+
+      assert request.url == url,
+        "url does not match memo"
+
+      # Compare request method to memo
+      assert request.method in memo.content.methods,
+        "HTTP method does not match memo"
 
 
 export default Verify

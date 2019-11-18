@@ -1,5 +1,4 @@
-import {isType, isObject, fromJSON, toJSON,
-  isEmpty, last} from "panda-parchment"
+import {isType, areType, fromJSON, toJSON, isEmpty, last} from "panda-parchment"
 import _fetch from "node-fetch"
 import URLTemplate from "url-template"
 
@@ -206,5 +205,6 @@ Container = (library, confidential) ->
         claim: Claim.from "utf8", claim if claim?
 
     @isType: isType @
+    @areType: areType @
 
 export default Container

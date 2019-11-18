@@ -1,4 +1,4 @@
-import {isType, isObject, fromJSON, toJSON} from "panda-parchment"
+import {isType} from "panda-parchment"
 
 Container = (library, confidential) ->
   {Declaration, verify} = confidential

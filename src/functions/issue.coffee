@@ -45,14 +45,3 @@ Issue = (library, confidential) ->
   issue
 
 export default Issue
-
-
-#   # Place grant into directory of contracts.
-#   {template, methods} = capability
-#
-#   directory[template] = {}
-#   for method in methods
-#     directory[template][method] =
-#       Contract.create grant:
-#
-# Directory.create directory

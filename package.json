@@ -35,7 +35,7 @@
     "ajv": "^6.10.2",
     "node-fetch": "^2.6.0",
     "panda-generics": "^6.0.0",
-    "panda-parchment": "^6.0.1",
+    "panda-parchment": "^6.0.3",
     "url-template": "^2.0.8"
   },
   "devDependencies": {
