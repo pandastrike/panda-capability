@@ -11,7 +11,7 @@ Bundle = (library, confidential) ->
 
     directory = {}
     for contract in contracts
-      {template, methods} = contract
+      {template, methods} = contract.grant
 
       directory[template] = {}
       for method in methods

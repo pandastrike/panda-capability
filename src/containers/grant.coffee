@@ -1,4 +1,4 @@
-import {isType} from "panda-parchment"
+import {isType, areType} from "panda-parchment"
 import AJV from "ajv"
 import schema from "../schema/grant"
 
@@ -12,10 +12,9 @@ Container = (library, confidential) ->
       @validate()
       @signatories = @declaration.signatories.list "base64"
 
-      {@message} = @declaration
       {@template, @methods,
         @expires, @tolerance,
-        @issuer, @revocations=[], @claimant} = @message.json()
+        @issuer, @revocations=[], @claimant} = @declaration.message.json()
 
     to: (hint) -> @declaration.to hint
 

@@ -12,7 +12,7 @@ Lookup = (library, confidential) ->
   Method.define lookup, Directory.isType, isString, isObject,
     (directory, path, description) ->
       for template, methods of directory
-        if path == URLTemplate.parse(template).expand description
+        if path == URLTemplate.parse(template).expand(description)
           return methods
       undefined
 

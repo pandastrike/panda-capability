@@ -1,4 +1,4 @@
-import {isType, toJSON} from "panda-parchment"
+import {isType, areType, toJSON} from "panda-parchment"
 import AJV from "ajv"
 import schema from "../schema/delegation"
 
@@ -12,10 +12,9 @@ Container = (library, confidential) ->
       @validate()
       @signatories = @declaration.signatories.list "base64"
 
-      {@message} = @declaration
       {@template, @methods,
         @integrity, @expires,
-        @claimant, @revocations=[], @delegate} = @message.json()
+        @claimant, @revocations=[], @delegate} = @declaration.message.json()
 
     to: (hint) -> @declaration.to hint
 

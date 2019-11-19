@@ -40,7 +40,7 @@ checkAuthority = (signatory, A1, A2) ->
 
 Container = (library, confidential) ->
   {Grant, Delegation, Claim} = library
-  {Declaration, verify, Message, hash} = confidential
+  {Declaration, verify, Message, hash, convert} = confidential
 
   class Contract
     constructor: ({@grant, @delegations, @claim}) ->
@@ -53,10 +53,10 @@ Container = (library, confidential) ->
         delegations: (delegation.to "utf8" for delegation in @delegations)
         claim: @claim.to "utf8" if @claim?
 
-        if hint == "utf8"
-          toJSON contract
-        else
-          convert from: "utf8", to: hint, toJSON contract
+      if hint == "utf8"
+        toJSON contract
+      else
+        convert from: "utf8", to: hint, toJSON contract
 
     verify: ->
       authorityLookupPromise = @verifyAuthorities()
@@ -107,7 +107,7 @@ Container = (library, confidential) ->
       now = new Date().toISOString()
 
       if @grant.expires?
-        assert (@grant.expires < now), "grant is expired."
+        assert (now < @grant.expires), "grant is expired."
 
       for delegation in @delegations
         if delegation.expires?
@@ -118,7 +118,7 @@ Container = (library, confidential) ->
       assert @claim?.verify(), "invalid claim signature"
 
       # Does not validate delegation chain, only individual self-consistency.
-      for delegation in contract.delegations
+      for delegation in @delegations
         assert delegation.verify(), "invalid delegation signature"
 
     verifyDelegationIntegrity: ->
@@ -130,7 +130,7 @@ Container = (library, confidential) ->
         else
           throw new Error "invalid delegation chain integrity"
 
-    verifyToleranceCheck: ->
+    verifyTolerance: ->
       {tolerance} = @grant
       timestamp = new Date @claim.timestamp
       now = new Date()
@@ -138,11 +138,11 @@ Container = (library, confidential) ->
       high = new Date()
 
       if (seconds = tolerance.seconds)?
-        low.setSeconds now.getSeconds - seconds
-        high.setSeconds now.getSeconds + seconds
+        low.setSeconds now.getSeconds() - seconds
+        high.setSeconds now.getSeconds() + seconds
       else if (minutes = tolerance.minutes)?
-        low.setMinutes now.getMinutes - minutes
-        high.setMinutes now.getMinutes + minutes
+        low.setMinutes now.getMinutes() - minutes
+        high.setMinutes now.getMinutes() + minutes
       else
         throw new Error "undefined grant tolerance"
 
@@ -160,6 +160,7 @@ Container = (library, confidential) ->
 
       if @claim.template?
         if isEmpty parameters
+          parameters = @claim.template
         else
           throw new Error "Invalid claim. May not re-bind URL template when bound by a delegation."
 

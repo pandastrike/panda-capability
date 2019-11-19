@@ -1,6 +1,6 @@
 import URLTemplate from "url-template"
 import Method from "panda-generics"
-import {toJSON, isObject, isEmpty} from "panda-parchment"
+import {toJSON, isObject, isString} from "panda-parchment"
 
 assert = (predicate, message) ->
   throw new Error "verify failure: #{message}" unless predicate
@@ -35,7 +35,7 @@ Verify = (library, confidential) ->
         "HTTP method does not match claim"
 
 
-  Method.define verify, isObject, Memo.isType, isString
+  Method.define verify, isObject, Memo.isType, isString,
     (request, memo, secret) ->
 
       # Internal consistency checks.
@@ -56,5 +56,6 @@ Verify = (library, confidential) ->
       assert request.method in memo.content.methods,
         "HTTP method does not match memo"
 
+  verify
 
 export default Verify

@@ -1,11 +1,11 @@
-import {isType, fromJSON, toJSON} from "panda-parchment"
+import {isType, areType, fromJSON, toJSON} from "panda-parchment"
 import AJV from "ajv"
 import schema from "../schema/memo"
 
 ajv = new AJV()
 
 Container = (library, confidential) ->
-  {Message, hash} = confidential
+  {Message, hash, convert} = confidential
 
   class Memo
     constructor: ({@integrity, @content, @claim}) ->
@@ -42,5 +42,6 @@ Container = (library, confidential) ->
           fromJSON convert from: hint, to: "utf8", value
 
     @isType: isType @
+    @areType: areType @
 
 export default Container

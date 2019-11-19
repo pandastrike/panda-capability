@@ -1,4 +1,4 @@
-import {isType, include, toJSON, fromJSON, values} from "panda-parchment"
+import {isType, areType, include, toJSON, fromJSON, values} from "panda-parchment"
 
 Container = (library, confidential) ->
   {Contract} = library
@@ -14,7 +14,7 @@ Container = (library, confidential) ->
       for template, methods of @
         directory[template] = {}
         for method, contract of methods
-          directory[template][method] = Contract.to "utf8"
+          directory[template][method] = contract.to "utf8"
 
       if hint == "utf8"
         toJSON directory
@@ -43,5 +43,6 @@ Container = (library, confidential) ->
         directory
 
     @isType: isType @
+    @areType: areType @
 
 export default Container

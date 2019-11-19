@@ -11,7 +11,7 @@ Delegate = (library, confidential) ->
 
   Method.define delegate,
     SignatureKeyPair.isType, Contract.isType, isObject,
-    (claimantKeyPair, contract, delegation}) ->
+    (claimantKeyPair, contract, delegation) ->
 
       contract = Contract.create contract
 
@@ -44,7 +44,7 @@ Delegate = (library, confidential) ->
     SignatureKeyPair.areType,
     Contract.isType,
     isObject,
-    (claimantKeyPair, revocationArray, contract, delegation}) ->
+    (claimantKeyPair, revocationArray, contract, delegation) ->
 
       contract = delegate claimantKeyPair, contract, delegation
 

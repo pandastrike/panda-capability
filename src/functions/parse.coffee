@@ -4,7 +4,7 @@ assert = (predicate, message) ->
   throw new Error "authorization parse failure: #{message}" unless predicate
 
 Parse = (library, confidential) ->
-  {Claim} = library
+  {Contract, Memo} = library
 
   (request) ->
     header = request?.headers?.authorization

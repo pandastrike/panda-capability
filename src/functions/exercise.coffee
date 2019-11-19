@@ -11,7 +11,7 @@ Exercise = (library, confidential) ->
 
   Method.define exercise,
     SignatureKeyPair.isType, Contract.isType, isObject,
-    (claimantKeyPair, contract, parameters}) ->
+    (claimantKeyPair, contract, parameters) ->
 
       claim = merge parameters, timestamp: new Date().toISOString()
 
@@ -19,9 +19,6 @@ Exercise = (library, confidential) ->
       Contract.create merge contract,
         claim: Claim.create sign claimantKeyPair,
           Message.from "utf8", toJSON claim
-
-      contract
-
 
   exercise
 
