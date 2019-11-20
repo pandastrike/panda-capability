@@ -9,13 +9,14 @@ compare = (signatory, key) ->
   assert signatory == key, "unsatisfied authority"
 
 fetch = (url) ->
-  response = await _fetch url
+  console.log "fetching from: #{url}"
+  response = await _fetch url,
     method: "GET"
     redirect: "follow"
     follow: 20
 
   if response.status == 200
-    await response.text()
+    (await response.text()).trim()
   else
     throw new Error "key authority fetch failed with status #{response.status}"
 

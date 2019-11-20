@@ -2,7 +2,7 @@ import assert from "assert"
 import {toJSON, clone} from "panda-parchment"
 
 import {confidential as Confidential} from "panda-confidential"
-import Capability from "../src"
+import Capability from "../../../src"
 
 confidential = Confidential()
 {SignatureKeyPair, PrivateKey} = confidential

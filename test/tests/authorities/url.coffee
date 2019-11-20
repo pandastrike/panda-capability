@@ -1,8 +1,10 @@
 import assert from "assert"
 import {toJSON, clone} from "panda-parchment"
 
+import keyStore from "../../key-store"
+
 import {confidential as Confidential} from "panda-confidential"
-import Capability from "../src"
+import Capability from "../../../src"
 
 confidential = Confidential()
 {SignatureKeyPair, PrivateKey} = confidential
@@ -11,10 +13,10 @@ confidential = Confidential()
 
 Test = ->
   # The API has its own signature key pair for issuing capabilites to people
-  APIKeyPair = await SignatureKeyPair.create()
+  APIKeyPair = SignatureKeyPair.from "base64", keyStore.issuer.main
 
   # Alice creates her profile signing key pair.
-  Alice = await SignatureKeyPair.create()
+  Alice = SignatureKeyPair.from "base64", keyStore.alice.devices[0]
 
 
   #==========================================
@@ -33,9 +35,9 @@ Test = ->
         seconds: 5
       expires: expiration
       issuer:
-        literal: APIKeyPair.publicKey.to "base64"
+        url: "http://localhost:8000/issuer/main"
       claimant:
-        literal: Alice.publicKey.to "base64"
+        url: "http://localhost:8000/alice/device0"
 
     issue APIKeyPair,
       template: "/profiles/alice/dashes/{id}"
@@ -44,9 +46,9 @@ Test = ->
         seconds: 5
       expires: expiration
       issuer:
-        literal: APIKeyPair.publicKey.to "base64"
+        url: "http://localhost:8000/issuer/main"
       claimant:
-        literal: Alice.publicKey.to "base64"
+        url: "http://localhost:8000/alice/device0"
   ]
 
   # API serializes the directory for transport to alice.
@@ -77,7 +79,7 @@ Test = ->
     template: parameters
     method: "PUT"
     claimant:
-      literal: Alice.publicKey.to "base64"
+      url: "http://localhost:8000/alice/device0"
 
   # The contract is ready to be serialized and placed into the Authorization header.
   request =
@@ -87,11 +89,6 @@ Test = ->
       authorization: "Capability #{contract.to "base64"}"
       date: new Date().toISOString()  # added by Fetch agent automatically.
 
-  # Alternate request with different cased authorization scheme name.
-  request2 = clone request
-  request2.headers.authorization = "capability #{contract.to "base64"}"
-
-
   #=======================================
 
 
@@ -99,7 +96,6 @@ Test = ->
   try
     # API verifies the request's claim
     contract = parse request
-    parse request2  # case insenstivity check
     await verify request, contract
   catch e
     console.error e
@@ -110,6 +106,5 @@ Test = ->
 
   # Panda-capability confirms the consistency of a contract and its components. When using Web signatures, panda-capability issues HTTP requests to confirm the key value as part of the verify flow.
 
-  # However, in this case we only dealt with Authority literals.  So, a validator would need to compare the keys idependently with some authoritative source if there is reason to suspect the issuer or claimant keys have been revoked since issuance.
 
 export default Test
