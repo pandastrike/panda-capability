@@ -4,7 +4,8 @@
   "description": "Sane Web Capabilities",
   "main": "build/npm/src/index.js",
   "scripts": {
-    "test": "p9k npm:test"
+    "test": "p9k npm:test",
+    "fixtures": "node build/npm/test/authority-server.js"
   },
   "repository": {
     "type": "git",

@@ -9,7 +9,6 @@ compare = (signatory, key) ->
   assert signatory == key, "unsatisfied authority"
 
 fetch = (url) ->
-  console.log "fetching from: #{url}"
   response = await _fetch url,
     method: "GET"
     redirect: "follow"

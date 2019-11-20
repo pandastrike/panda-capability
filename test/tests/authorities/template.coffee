@@ -13,7 +13,7 @@ confidential = Confidential()
 
 Test = ->
   # The API has its own signature key pair for issuing capabilites to people
-  APIKeyPair = SignatureKeyPair.from "base64", keyStore.issuer
+  APIKeyPair = SignatureKeyPair.from "base64", keyStore.issuer.main
 
   # Alice creates her profile signing key pair.
   Alice = SignatureKeyPair.from "base64", keyStore.alice.devices[0]
@@ -35,7 +35,7 @@ Test = ->
         seconds: 5
       expires: expiration
       issuer:
-        url: "http://localhost:8000/issuer"
+        url: "http://localhost:8000/issuer/main"
       claimant:
         template: "http://localhost:8000/alice/{device}"
 
@@ -46,7 +46,7 @@ Test = ->
         seconds: 5
       expires: expiration
       issuer:
-        url: "http://localhost:8000/issuer"
+        url: "http://localhost:8000/issuer/main"
       claimant:
         template: "http://localhost:8000/alice/{device}"
   ]
@@ -80,7 +80,7 @@ Test = ->
     method: "PUT"
     claimant:
       template:
-        device: "device01"
+        device: "device0"
 
   # The contract is ready to be serialized and placed into the Authorization header.
   request =
