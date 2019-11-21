@@ -15,7 +15,7 @@ Container = (library, confidential) ->
       @validate()
       @signatories = @declaration.signatories.list "base64"
 
-      {@template={}, @method,
+      {@template, @method,
         @timestamp,
         @claimant} = @declaration.message.json()
 

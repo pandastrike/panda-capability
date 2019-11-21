@@ -70,14 +70,24 @@ schema =
       type: "array"
       minItems: 1
       items:
-        type: "object"
-        additionalProperties: false
-        required: ["url"]
-        properties:
-          url:
-            description: "A URL where one may find the public signature key for the issuer authority for validation."
-            type: "string"
-            format: "uri"
+        oneOf: [
+          type: "object"
+          additionalProperties: false
+          required: ["literal"]
+          properties:
+            literal:
+              description: "The literal public signature key of the revocation authority, given as a base64 encoded string. The validity check of this literal is outside the scope of this library."
+              type: "string"
+
+          type: "object"
+          additionalProperties: false
+          required: ["url"]
+          properties:
+            url:
+              description: "A URL where one may find the public signature key for the issuer authority for validation."
+              type: "string"
+              format: "uri"
+        ]  
 
     claimant:
       description: "Describes the claimant authority, given privilege to excercise the grant. May be one of: a key literal, a URL reference, a URL template with enumerated parameter names."

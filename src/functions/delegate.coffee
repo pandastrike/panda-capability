@@ -52,7 +52,7 @@ Delegate = (library, confidential) ->
         throw new Error "mismatch in number of revocation key pairs and authority definitions"
 
       for keyPair in revocationArray
-        sign keyPair, last contract.delegations
+        sign keyPair, (last contract.delegations).declaration
 
       contract
 
