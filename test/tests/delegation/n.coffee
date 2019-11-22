@@ -98,7 +98,6 @@ Test = ->
     method: "GET"
     headers:
       authorization: "Capability #{contract.to "base64"}"
-      date: new Date().toISOString()  # added by Fetch agent automatically.
 
   #=======================================
 

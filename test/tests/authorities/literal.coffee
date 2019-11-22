@@ -84,7 +84,6 @@ Test = ->
     method: "PUT"
     headers:
       authorization: "Capability #{contract.to "base64"}"
-      date: new Date().toISOString()  # added by Fetch agent automatically.
 
   # Alternate request with different cased authorization scheme name.
   request2 = clone request

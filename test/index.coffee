@@ -57,20 +57,20 @@ do ->
         Tests.Revocation.claimant
     ]
 
-    # test "Attacks", [
-    #   test
-    #     description: "Forgery"
-    #     wait: false,
-    #     Tests.Constraints.expiration
-    #
-    #   test
-    #     description: "Escalation"
-    #     wait: false,
-    #     Tests.Constraints.expiration
-    #
-    #   test
-    #     description: "Replay"
-    #     wait: false,
-    #     Tests.Constraints.url
-    # ]
+    test "Attacks", [
+      test
+        description: "Forgery"
+        wait: false,
+        Tests.Attacks.forgery
+
+      test
+        description: "Escalation"
+        wait: false,
+        Tests.Attacks.escalation
+
+      test
+        description: "Replay"
+        wait: false,
+        Tests.Attacks.replay
+    ]
   ]
