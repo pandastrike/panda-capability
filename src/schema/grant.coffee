@@ -87,7 +87,7 @@ schema =
               description: "A URL where one may find the public signature key for the issuer authority for validation."
               type: "string"
               format: "uri"
-        ]  
+        ]
 
     claimant:
       description: "Describes the claimant authority, given privilege to excercise the grant. May be one of: a key literal, a URL reference, a URL template with enumerated parameter names."

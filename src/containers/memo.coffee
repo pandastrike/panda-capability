@@ -1,4 +1,4 @@
-import {isType, areType, fromJSON, toJSON} from "panda-parchment"
+import {isType, areType, fromJSON, toJSON, merge} from "panda-parchment"
 import AJV from "ajv"
 import schema from "../schema/memo"
 
@@ -20,7 +20,7 @@ Container = (library, confidential) ->
 
     # Verifies the integrity of the memo, given the anchoring secret.
     verify: (secret) ->
-      claim = hash Message.from "utf8", toJSON merge {secret}, content
+      claim = hash Message.from "utf8", toJSON merge {secret}, @content
       .to "base64"
 
       unless claim == @integrity

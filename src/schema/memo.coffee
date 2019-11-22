@@ -1,11 +1,11 @@
 schema =
   type: "object"
   additionalProperties: false
-  required: ["integrity", "body"]
+  required: ["integrity", "content"]
   properties:
 
     integrity:
-      description: "The SHA-512 hash of this memo's stringified body and a secret known only to the issuer. Given as a base64 encoded string. This hash ensures a validator may honor the claim against the memoized grant without fear of tampering."
+      description: "The SHA-512 hash of this memo's stringified content and a secret known only to the issuer. Given as a base64 encoded string. This hash ensures a validator may honor the claim against the memoized grant without fear of tampering."
       type: "string"
 
     content:
@@ -25,7 +25,7 @@ schema =
               url:
                 description: "A URL that the memo authorizes against. This form accepts no parameters and is limited to exactly the URL specified."
                 type: "string"
-                format: "uri"
+                format: "uri-reference"
           ,
             type: "object"
             additionalProperties: false

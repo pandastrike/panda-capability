@@ -2,7 +2,7 @@ import {toJSON, isObject, merge} from "panda-parchment"
 import Method from "panda-generics"
 
 Exercise = (library, confidential) ->
-  {Claim, Contract} = library
+  {Claim, Contract, Memo} = library
   {SignatureKeyPair, sign, Message} = confidential
 
   exercise = Method.create
@@ -19,6 +19,13 @@ Exercise = (library, confidential) ->
       Contract.create merge contract,
         claim: Claim.create sign claimantKeyPair,
           Message.from "utf8", toJSON claim
+
+  Method.define exercise,
+    Memo.isType, isObject,
+    (memo, claim) ->
+
+      # Add a claim stanze to the memo. Is not true claim with countersignature
+      Memo.create merge memo, {claim}
 
   exercise
 

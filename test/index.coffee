@@ -73,4 +73,12 @@ do ->
         wait: false,
         Tests.Attacks.replay
     ]
+
+    test "Memoization", [
+      test
+        description: "Literal"
+        wait: false,
+        Tests.Memoization.literal
+    ]
+
   ]
