@@ -57,12 +57,11 @@ Test = ->
     headers:
       authorization: "Capability #{contract.to "base64"}"
 
+  error = null
   try
-    # API verifies the request's claim
-    contract = parse request
     await verify request, contract
-    assert.fail "verification should fail."
-  catch
+  catch error
+  assert.fail "verification should fail." unless error?
 
 
   contract = issue APIKeyPair,
@@ -76,7 +75,6 @@ Test = ->
     claimant:
       url: "http://localhost:8000/alice/device0"
 
-  contract.grant.template = "/profiles/bob/dashes/{id}"
   contract = exercise Alice, contract,
     template: parameters
     method: "PUT"
@@ -89,12 +87,13 @@ Test = ->
     headers:
       authorization: "Capability #{contract.to "base64"}"
 
+  error = null
   try
-    # API verifies the request's claim
-    contract = parse request
     await verify request, contract
-    assert.fail "verification should fail."
-  catch
+  catch error
+  assert.fail "verification should fail." unless error?
+
+
 
 
   contract = issue APIKeyPair,
@@ -108,7 +107,6 @@ Test = ->
     claimant:
       url: "http://localhost:8000/alice/device0"
 
-  contract.grant.methods.push "DELETE"
   contract = exercise Alice, contract,
     template: parameters
     method: "DELETE"
@@ -121,12 +119,11 @@ Test = ->
     headers:
       authorization: "Capability #{contract.to "base64"}"
 
+  error = null
   try
-    # API verifies the request's claim
-    contract = parse request
     await verify request, contract
-    assert.fail "verification should fail."
-  catch
+  catch error
+  assert.fail "verification should fail." unless error?
 
 
   #=======================================
@@ -162,12 +159,11 @@ Test = ->
     headers:
       authorization: "Capability #{contract.to "base64"}"
 
+  error = null
   try
-    # API verifies the request's claim
-    contract = parse request
     await verify request, contract
-    assert.fail "verification should fail."
-  catch
+  catch error
+  assert.fail "verification should fail." unless error?
 
 
   contract = issue APIKeyPair,
@@ -201,12 +197,11 @@ Test = ->
     headers:
       authorization: "Capability #{contract.to "base64"}"
 
+  error = null
   try
-    # API verifies the request's claim
-    contract = parse request
     await verify request, contract
-    assert.fail "verification should fail."
-  catch
+  catch error
+  assert.fail "verification should fail." unless error?
 
 
 
@@ -241,12 +236,11 @@ Test = ->
     headers:
       authorization: "Capability #{contract.to "base64"}"
 
+  error = null
   try
-    # API verifies the request's claim
-    contract = parse request
     await verify request, contract
-    assert.fail "verification should fail."
-  catch
+  catch error
+  assert.fail "verification should fail." unless error?
 
   #=======================================
 

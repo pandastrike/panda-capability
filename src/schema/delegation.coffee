@@ -24,6 +24,11 @@ schema =
       type: "string"
       format: "date-time"
 
+    embargo:
+      description: "Optional. Describes the datetime at which this delegation becomes valid. Therefore, this field allows the claimant to provide time-delayed delgations that are issued now, but become valid at an arbitrarily specified time in the future. Given as an ISO 8601 timestamp."
+      type: "string"
+      format: "date-time"
+
     claimant:
       description: "Describes the claimant authority, from where the delegation authority flows. The delegation is signed with this authority. May be one of: a key literal, a URL reference."
       oneOf: [

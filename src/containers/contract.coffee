@@ -61,6 +61,7 @@ Container = (library, confidential) ->
     verify: ->
       authorityLookupPromise = @verifyAuthorities()
 
+      @verifyEmbargo()
       @verifyExpiration()
       @verifySignatures()
       @verifyDelegationIntegrity()
@@ -102,16 +103,25 @@ Container = (library, confidential) ->
       assert @claim.signatories.length == 1, "unsatisfied authority"
       await checkAuthority @claim.signatories[0], claimant, @claim.claimant
 
+    verifyEmbargo: ->
+      now = new Date().toISOString()
+
+      if (embargo = @grant.embargo)?
+        assert (now > embargo), "grant is not valid until #{embargo}."
+
+      for delegation in @delegations
+        if (embargo = delegation.embargo)?
+          assert (now > embargo), "delegation not valid until #{embargo}"
 
     verifyExpiration: ->
       now = new Date().toISOString()
 
-      if @grant.expires?
-        assert (now < @grant.expires), "grant is expired."
+      if (expires = @grant.expires)?
+        assert (now < expires), "grant expired at #{expires}"
 
       for delegation in @delegations
-        if delegation.expires?
-          assert (delegation.expires < now), "delegation is expired"
+        if (expires = delegation.expires)?
+          assert (now < expires), "delegation expired at #{expires}"
 
     verifySignatures: ->
       assert @grant?.verify(), "invalid grant signature"

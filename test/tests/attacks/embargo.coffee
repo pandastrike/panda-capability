@@ -25,16 +25,16 @@ Test = ->
 
 
   #======================================
-  # Replay beyond grant expiration.
+  # Run before grant embargo lifts.
 
   contract = issue APIKeyPair,
     template: "/profiles/alice/dashes/{id}"
     methods: ["GET", "PUT"]
     tolerance:
       seconds: 5
-    expires: do ->
+    embargo: do ->
       d = new Date()
-      d.setSeconds d.getSeconds() + 1
+      d.setSeconds d.getSeconds() + 2
       d.toISOString()
     issuer:
       url: "http://localhost:8000/issuer/main"
@@ -53,17 +53,26 @@ Test = ->
     headers:
       authorization: "Capability #{contract.to "base64"}"
 
+  error = null
+  try
+    await verify request, contract
+  catch error
+  assert.fail "verification should fail." unless error?
+
   try
     await sleep 2000
     await verify request, contract
-    assert.fail "verification should fail."
-  catch
+  catch e
+    console.log e
+    assert.fail "verificaiton should pass"
+
+
 
 
 
 
   #=======================================
-  # Replay beyond delegation expiration.
+  # Run before delegation embargo lifts.
 
   contract = issue APIKeyPair,
     template: "/profiles/alice/dashes/{id}"
@@ -83,9 +92,9 @@ Test = ->
   contract = delegate Alice, contract,
     template: parameters
     methods: ["PUT"]
-    expires: do ->
+    embargo: do ->
       d = new Date()
-      d.setSeconds d.getSeconds() + 1
+      d.setSeconds d.getSeconds() + 2
       d.toISOString()
     claimant:
       url: "http://localhost:8000/alice/device0"
@@ -105,45 +114,16 @@ Test = ->
 
   error = null
   try
-    await sleep 2000
     await verify request, contract
   catch error
   assert.fail "verification should fail." unless error?
 
-
-
-  #======================================
-  # Replay beyond grant tolerance.
-
-  contract = issue APIKeyPair,
-    template: "/profiles/alice/dashes/{id}"
-    methods: ["GET", "PUT"]
-    tolerance:
-      seconds: 1
-    issuer:
-      url: "http://localhost:8000/issuer/main"
-    claimant:
-      url: "http://localhost:8000/alice/device0"
-
-  contract = exercise Alice, contract,
-    template: parameters
-    method: "PUT"
-    claimant:
-      url: "http://localhost:8000/alice/device0"
-
-  request =
-    url: "/profiles/alice/dashes/12345"
-    method: "PUT"
-    headers:
-      authorization: "Capability #{contract.to "base64"}"
-
-  error = null
   try
     await sleep 2000
     await verify request, contract
-  catch error
-  assert.fail "verification should fail." unless error?
-
+  catch e
+    console.log e
+    assert.fail "verificaiton should pass"
 
 
 export default Test

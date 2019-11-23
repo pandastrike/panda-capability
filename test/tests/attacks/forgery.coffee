@@ -63,12 +63,11 @@ Test = ->
     headers:
       authorization: "Capability #{contract.to "base64"}"
 
+  error = null
   try
-    # API verifies the request's claim
-    contract = parse request
     await verify request, contract
-    assert.fail "verification should fail."
-  catch
+  catch error
+  assert.fail "verification should fail." unless error?
 
   #=======================================
   # Forged method
@@ -85,12 +84,11 @@ Test = ->
     headers:
       authorization: "Capability #{contract.to "base64"}"
 
+  error = null
   try
-    # API verifies the request's claim
-    contract = parse request
     await verify request, contract
-    assert.fail "verification should fail."
-  catch
+  catch error
+  assert.fail "verification should fail." unless error?
 
   #=======================================
 

@@ -72,6 +72,11 @@ do ->
         description: "Replay"
         wait: false,
         Tests.Attacks.replay
+
+      test
+        description: "Embargo Running"
+        wait: false,
+        Tests.Attacks.embargo
     ]
 
     test "Memoization", [

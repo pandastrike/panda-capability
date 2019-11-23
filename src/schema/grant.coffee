@@ -44,6 +44,11 @@ schema =
       type: "string"
       format: "date-time"
 
+    embargo:
+      description: "Optional. Describes the datetime at which this grant becomes valid. Therefore, this field allows the issuer to issue time-delayed grants that are issued now, but become valid at an arbitrarily specified time in the future. Given as an ISO 8601 timestamp."
+      type: "string"
+      format: "date-time"
+
     issuer:
       description: "Describes the authority issuing the grant. May be either  a key literal or a URL reference."
       oneOf: [
