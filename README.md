@@ -8,9 +8,9 @@ Web capabilities adapt this idea by using cryptographic signatures to ensure the
 
 ### **Web Capabilities are Adversarial**
 
-In distributed systems like the Web, [you can't trust the network](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing).  So Web capabilities aim to be thorough and adversarial in the evaluation of a request.  
+In distributed systems like the Web, [you can't trust the network](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing). So Web capabilities aim to be adversarial in the evaluation of a request.
 
-Web capabilities must also be cryptographically signed by client, which provides [non-repudiation](https://en.wikipedia.org/wiki/Non-repudiation)) and guards against request tampering.  We can prove that a particular person sent a particular HTTP request with a particular set of URL, header, and body properties.
+This is why Web capabilities must not only be cryptographically signed by the issuer, but also the by client exercising a grant (a capabilities signed by the issuer), which provides [non-repudiation](https://en.wikipedia.org/wiki/Non-repudiation)) and guards against request tampering.  We can prove that a particular person sent a particular HTTP request with a particular set of URL, header, and body properties.
 
 Web capabilities also follow the [principle of least privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege), since they can be verified without privileged access.
 
