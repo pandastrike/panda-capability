@@ -1,4 +1,4 @@
-## Adversarial Design for the Open Web
+## Web Capabilities: Distributed Authorization For The Open Web
 
 *Web Capabilities* provide authorization to perform a set of HTTP requests. They are modeled after [capability security models](https://en.wikipedia.org/wiki/Capability-based_security) [emphasis added]:
 
