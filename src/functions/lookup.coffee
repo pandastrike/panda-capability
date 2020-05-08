@@ -1,4 +1,4 @@
-import {toJSON, isString, isObject} from "panda-parchment"
+import {isString, isObject} from "panda-parchment"
 import Method from "panda-generics"
 import URLTemplate from "url-template"
 

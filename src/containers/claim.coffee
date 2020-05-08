@@ -1,4 +1,4 @@
-import {isType, areType} from "panda-parchment"
+import {isType, areType, toJSON} from "panda-parchment"
 import AJV from "ajv"
 import schema from "../schema/claim"
 
