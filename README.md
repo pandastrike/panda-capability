@@ -1,50 +1,24 @@
-## Adversarial Design for the Open Web
+## Web Capabilities: Distributed Authorization For The Open Web
 
-*Web Capabilities* are authorization to perform a set of HTTP requests. They are modeled after [capability security models](https://en.wikipedia.org/wiki/Capability-based_security) [emphasis added]:
+*Web Capabilities* provide authorization to perform a set of HTTP requests. They are modeled after [capability security models](https://en.wikipedia.org/wiki/Capability-based_security) [emphasis added]:
 
 > Capabilities achieve their objective of improving system security by being used in place of forgeable references. A forgeable reference (for example, a path name) identifies an object, but does not specify which access rights are appropriate for that object and the user program which holds that reference. Consequently, any attempt to access the referenced object must be validated by the operating system, based on the ambient authority of the requesting program, typically via the use of an access control list (ACL). Instead, in a system with capabilities, the mere fact that a user program possesses that capability entitles it to use the referenced object in accordance with the rights that are specified by that capability. ***In theory, a system with capabilities removes the need for any access control list or similar mechanism*** by giving all entities all and only the capabilities they will actually need.
 
-Put another way, capabilities provide *intrinsic authorization* and reduce the overall surface area for attackers; thus capabilities provide stronger security.
-
-Web capabilities are self-contained, and therefore may appear to be more complex to implement than current, popular authorization schemes (even if that can be minimized by libraries).  However, Web capabilities greatly reduce the implementation effort for interface owners due to their smaller surface area.  That is, you don't need to weave brittle ACL checks throughout your codebase.
-
-Web capabilities address the tension between two design goals: providing robust security and participating in the Open Web.
+Web capabilities adapt this idea by using cryptographic signatures to ensure they cannot be forged. They naturally extend the state transfer design of the Open Web, since they can be sent to the client, much like cookies.
 
 ### **Web Capabilities are Adversarial**
 
-In distributed systems like the Web, [you can't trust the network](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing).  So Web capabilities aim to be thorough and adversarial in the evaluation of a request.  
+In distributed systems like the Web, [you can't trust the network](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing). So Web capabilities aim to be adversarial in the evaluation of a request.
 
-Through the use of robust digital signing, Web capabilities give us a way to check identity (importantly, providing *both* authentication and [non-repudiation](https://en.wikipedia.org/wiki/Non-repudiation)) and guard against request tampering.  We can prove that a particular person sent a particular HTTP request with a particular set of URL, header, and body properties.
+This is why Web capabilities must not only be cryptographically signed by the issuer, but also the by client exercising a grant (a capabilities signed by the issuer), which provides [non-repudiation](https://en.wikipedia.org/wiki/Non-repudiation)) and guards against request tampering.  We can prove that a particular person sent a particular HTTP request with a particular set of URL, header, and body properties.
 
-Web capabilities also obey the [principle of least privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege).  The null state for a recipient is to have *no* capability to do anything.  Any permission must be granted explicitly. 
+Web capabilities also follow the [principle of least privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege), since they can be verified without privileged access.
 
-For these reasons, Web capabilities out-class current, popular alternatives.  Consider these:
+### Designed for the Open Web
 
-- **Basic** 
-Sends base64 encoded username and password in the `authorization` header. Uses no cryptographic methods (relies on TLS). Passwords are hard for humans to remember and manage, attackers have gotten really good at guessing them, and validating them requires privileged access that can be exploited.
-- **Digest**
-Sends a hash of username and password in the `authorization` header, in conjunction with a nonce specified by the server. While superficially more secure than Basic (provided a robust hashing algorithm is used), Digest still fundamentally relies on passwords and is flawed for the same reasons.
-- **Bearer / OAuth**
-Sends a high-entropy value in the `authorization` header.  OAuth is a popular standard that uses the Bearer scheme to substitute Basic and implement delegation between applications – all while avoiding writing cryptographic implementations within client applications. Often, OAuth sessions are initiated with username-password login – which, again, is flawed.  Though not a requirement, Bearer tokens are usually coarse-grained.  That grants permissions on a variety of requests like a password, making the implementation vulnerable to phishing and replay attacks.  The fact that OAuth is commonly used for delegation compounds its flaws, encouraging HX that spreads broad permissions.
+The design of HTTP and other Web specifications is to [Create More Web](https://www.pandastrike.com/posts/20151019-create-more-web/). The Web accumulates value with each contribution to the ecosystem we all share and benefit from. 
 
-The above, most common alternatives are built on passwords, do not guard against request tampering, and require a central server as a source of truth.  Web capabilities are adversarial, and have none of these vulnerabilities.
-
-### But Also Designed for the Open Web
-
-The goal of HTTP and other Web specifications is to [Create More Web](https://www.pandastrike.com/posts/20151019-create-more-web/). That is, respect distributed architecture to foster the accumulation of value (via network effects) in the Web, an ecosystem we all share, including your interfaces. 
-
-Web capabilities align with the Open Web – providing the primitives to construct a web of trust, woven into the Web itself.   Consider an API handling a request containing a capability assertion.  We are concerned with two objectives:
-
-1. Rigorously verifying the internal consistency of the assertion
-2. Checking a public key registry to confirm the involved parties have not revoked their participation.
-
-Neither of those objectives requires privileged access:  ****(1) contemplates data *within* the assertion, while (2) is a check on *public* data.
-
-That's a huge win because it fosters decentralization.  That's reflected in the entity names, issuer-recipient rather than server-client.  We can put the verification flow anywhere, like within an intermediary (such as an edge cache for proxy server).  In fact, it is *more* secure to verify requests outside of the main API process space. If an attacker manages to trigger an unexpected code path, they are less likely to have access to sensitive data.
-
-Web capabilities can even be verified in a system owned entirely by a third party.  And future versions of the specification will support delegation, with similar public verification properties.
-
-All together, Web capabilities offer a more flexible, more robust alternative to current schemes. Web capabilities may appear more complex than username-password schemes, but the latter impose security and opportunity costs that were taken for granted until now.
+Capabilites can be moved across the network and verified by intermediaries. That's reflected in the entity names, issuer-recipient rather than server-client. This encourages decentralization and follows the principle of least privilege. It's more secure to verify requests outside of the main API process space. If an attacker manages to trigger an unexpected code path, they are less likely to have access to sensitive data. Web capabilities can even be verified in a system owned entirely by a third party.
 
 ## The Capability Document
 
@@ -52,21 +26,14 @@ A Capability is a simple document describing an allowed action. Web Capabilities
 
 ### Capability Document
 
-Unsupported in version 1.0:
-
-- `once` and `expiration`
-- providing more than one use key.
-
-### Example
-
-For example, this capability allows Leia to update or delete her dashes:
+This capability allows Leia to update or delete her posts:
 
     methods:
     - PUT
     - PATCH
     - DELETE
     - OPTIONS  # necessary for CORS
-    template: "<https://api.dashkite.com/dashes/leia/{id}>"
+    template: "https://api.rebelalliance.com/posts/leia/{id}"
     recipient: "RFfBy/1mioLtrsxk2CifDz/V3N4TauSca+xlwNN+wEI="
     use:
     - "XL9Jjv8cOs0TrNOJLhQ0eQbNeE7n67Zk//iToaB7UpA="
@@ -74,8 +41,6 @@ For example, this capability allows Leia to update or delete her dashes:
 Through the use of URL templates specified in [RFC 6570](https://tools.ietf.org/html/rfc6570), you can describe a set of HTTP requests on a collection of resources in an API. Web capabilities support flexible permission specification. Specify coarse-grained access with parameterization, or restrict the recipient to a single URL and HTTP method combination.
 
 A Web capability includes at least two public signing keys. One belonging to the recipient and one assigned by the issuer as a use key pair. Together, they grant flexible public key registry control. The use key pair allows for the revocation of the individual capability, while the recipient key pair allows for the revocation all capabilities associated with a recipient.
-
-Unsupported in version 1.0: per-use keys also support N-time use capabilities (by providing N keys and setting `once` to true).
 
 ## Introducing Panda-Capability
 
