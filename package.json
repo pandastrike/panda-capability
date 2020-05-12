@@ -2,21 +2,21 @@
   "name": "@dashkite/cobalt",
   "version": "2.0.0",
   "description": "Sane Web Capabilities",
-  "main": "build/npm/src/index.js",
-  "scripts": {
-    "test": "p9k test",
-    "fixtures": "node build/npm/test/authority-server.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/dashkite/cobalt.git"
-  },
   "keywords": [
     "cryptography",
     "capability",
     "security",
     "authorization"
   ],
+  "homepage": "https://github.com/pandastrike/panda-capability#readme",
+  "bugs": {
+    "url": "https://github.com/pandastrike/panda-capability/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dashkite/cobalt.git"
+  },
+  "license": "SEE LICENSE IN LICENSE.md",
   "contributors": [
     {
       "name": "Dan Yoder",
@@ -27,11 +27,14 @@
       "email": "david@pandastrike.com"
     }
   ],
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/pandastrike/panda-capability/issues"
+  "main": "build/npm/src/index.js",
+  "files": [
+    "./build"
+  ],
+  "scripts": {
+    "fixtures": "node build/npm/test/authority-server.js",
+    "test": "p9k test"
   },
-  "homepage": "https://github.com/pandastrike/panda-capability#readme",
   "dependencies": {
     "ajv": "^6.12.2",
     "node-fetch": "^2.6.0",
