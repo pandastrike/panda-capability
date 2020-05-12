@@ -29,10 +29,9 @@
   ],
   "main": "build/npm/src/index.js",
   "files": [
-    "./build"
+    "build/npm/src"
   ],
   "scripts": {
-    "fixtures": "node build/npm/test/authority-server.js",
     "test": "p9k test"
   },
   "dependencies": {
