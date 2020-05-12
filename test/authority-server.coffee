@@ -3,23 +3,34 @@ import http from "http"
 import express from "express"
 import {exists, read} from "panda-quill"
 
-app = express()
-port = 8000
+server = undefined
 
-# Create server that pulls from the local key registry.
-# TODO: P9K's preset compiles the tests in build, but the fixture keys are still in test uncompiled. Either format the registry as coffeescript, or change how the preset is being used.
-root = resolve __dirname, "..", "..", "..", "test", "authority-fixture"
+start = ->
 
-app.use express.static root
+  app = express()
+  port = 8000
 
-app.get "/revocation/:key", (req, res) ->
-  path = resolve root, "revocation", req.params.key
+  # Create server that pulls from the local key registry.
+  # TODO: P9K's preset compiles the tests in build, but the fixture keys are still
+  # in test uncompiled. Either format the registry as coffeescript, or change how
+  # the preset is being used.
+  root = resolve "test", "authority-fixture"
 
-  if await exists path
-    res.status(200).send await read path
-  else
-    res.status(404).send "Not Found"
+  app.use express.static root
 
-app.listen port
+  app.get "/revocation/:key", (req, res) ->
+    path = resolve root, "revocation", req.params.key
 
-console.log "now running server on port #{port}"
+    if await exists path
+      res.status(200).send await read path
+    else
+      res.status(404).send "Not Found"
+
+  server = app.listen port
+
+  console.log "now running server on port #{port}"
+
+stop = ->
+  server.close()
+
+export {start, stop}

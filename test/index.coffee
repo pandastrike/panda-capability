@@ -1,10 +1,14 @@
 import "source-map-support/register"
-import {print, test} from "amen"
+import {print, test, success} from "amen"
 import {sleep} from "panda-parchment"
+import {start, stop} from "./authority-server"
 
 import Tests from "./tests"
 
 do ->
+
+  start()
+
   await print await test "Panda Capability", [
     test "Authorities", [
       test
@@ -87,3 +91,7 @@ do ->
     ]
 
   ]
+
+  await stop()
+
+  process.exit if success then 0 else 1

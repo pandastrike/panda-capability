@@ -1,8 +1,7 @@
 import {resolve} from "path"
 import {exists, mkdirp, rm, write} from "panda-quill"
 
-root = resolve __dirname, "..", "..", "..",
-  "test", "authority-fixture", "revocation"
+root = resolve "test", "authority-fixture", "revocation"
 
 helpers = (confidential) ->
   {SignatureKeyPair} = confidential
@@ -12,8 +11,7 @@ helpers = (confidential) ->
     key = keyPair.publicKey.to "base64"
     name = keyPair.publicKey.to "safe-base64"
 
-    unless await exists root
-      await mkdirp root
+    await mkdirp 0o777, root
 
     await write (resolve root, name), key
     keyPair
