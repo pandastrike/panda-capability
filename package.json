@@ -1,15 +1,15 @@
 {
-  "name": "panda-capability",
+  "name": "@dashkite/cobalt",
   "version": "2.0.0",
   "description": "Sane Web Capabilities",
   "main": "build/npm/src/index.js",
   "scripts": {
-    "test": "p9k npm:test",
+    "test": "p9k test",
     "fixtures": "node build/npm/test/authority-server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pandastrike/panda-capability.git"
+    "url": "git+https://github.com/dashkite/cobalt.git"
   },
   "keywords": [
     "cryptography",
@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/pandastrike/panda-capability#readme",
   "dependencies": {
-    "ajv": "^6.10.2",
+    "ajv": "^6.12.2",
     "node-fetch": "^2.6.0",
     "panda-generics": "^6.0.0",
     "panda-parchment": "^6.0.3",
@@ -47,6 +47,6 @@
     "panda-builder": "^4.0.1",
     "panda-confidential": "^3.0.0",
     "panda-quill": "^5.0.0",
-    "source-map-support": "^0.5.9"
+    "source-map-support": "^0.5.19"
   }
 }
