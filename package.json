@@ -8,9 +8,9 @@
     "security",
     "authorization"
   ],
-  "homepage": "https://github.com/pandastrike/panda-capability#readme",
+  "homepage": "https://github.com/dashkite/cobalt#readme",
   "bugs": {
-    "url": "https://github.com/pandastrike/panda-capability/issues"
+    "url": "https://github.com/dashkite/cobalt/issues"
   },
   "repository": {
     "type": "git",
@@ -36,7 +36,6 @@
   },
   "dependencies": {
     "ajv": "^6.12.2",
-    "node-fetch": "^2.6.0",
     "panda-generics": "^6.0.0",
     "panda-parchment": "^6.0.3",
     "url-template": "^2.0.8"
@@ -45,6 +44,7 @@
     "amen": "^3.0.0",
     "express": "^4.17.1",
     "finalhandler": "^1.1.2",
+    "node-fetch": "^2.6.0",
     "panda-9000": "^5.0.0",
     "panda-builder": "^4.0.1",
     "panda-confidential": "^3.0.0",
