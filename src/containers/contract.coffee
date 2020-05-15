@@ -1,5 +1,4 @@
 import {isType, areType, fromJSON, toJSON, isEmpty, last} from "panda-parchment"
-import _fetch from "node-fetch"
 import URLTemplate from "url-template"
 
 assert = (predicate, message) ->
@@ -8,8 +7,8 @@ assert = (predicate, message) ->
 compare = (signatory, key) ->
   assert signatory == key, "unsatisfied authority"
 
-fetch = (url) ->
-  response = await _fetch url,
+_fetch = (url) ->
+  response = await fetch url,
     method: "GET"
     redirect: "follow"
     follow: 20
@@ -26,7 +25,7 @@ checkAuthority = (signatory, A1, A2) ->
   if A1.literal?
     compare signatory, A1.literal
   else if A1.url?
-    compare signatory, await fetch A1.url
+    compare signatory, await _fetch A1.url
   else if A1.template?
     assert A2.template?, "unsatisfied authority"
 
@@ -34,7 +33,7 @@ checkAuthority = (signatory, A1, A2) ->
       .parse A1.template  # URL template
       .expand A2.template # bound parameters
 
-    compare signatory, await fetch url
+    compare signatory, await _fetch url
   else
     throw new Error "malformed authority description"
 
