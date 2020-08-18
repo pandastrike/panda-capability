@@ -58,7 +58,7 @@ Alone, a Web capability is a mere description of an action. It is given force wh
 
 The capability within a grant contains only public keys (fields `publicUse` and `recipient`). So alongside a grant, the issuer needs to bundle the matching use key pair(s).
 
-Because Web capabilities can be fine-grained, we will end up with a collection of grants and their corresponding use key pairs. Cobalt has a container class called a `Directory` [to](http://directory.to) mange them.  
+Because Web capabilities can be fine-grained, we will end up with a collection of grants and their corresponding use key pairs. Cobalt has a container class called a `Directory` to mange them.  
 
 Grants are organized by URL template and HTTP method in a 2-D dictionary.  Together, they reference a given grant and its corresponding use key pair(s).  You can lookup an entry directly with `directory[<URL Template>][<HTTP Method>]`, but in practice you will use Cobalt's `lookup` function (see below).
 
