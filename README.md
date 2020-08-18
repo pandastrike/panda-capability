@@ -2,7 +2,7 @@
 
 *Web Capabilities* provide authorization to perform a set of HTTP requests. They are modeled after [capability security models](https://en.wikipedia.org/wiki/Capability-based_security). Web capabilities adapt this idea by using cryptographic signatures to ensure they cannot be forged. They naturally extend the state transfer design of the Open Web, since they can be sent to the client, much like cookies.
 
-### **Web Capabilities are Adversarial (Zero Trust)**
+### **Adversarial (Zero Trust)**
 
 In distributed systems like the Web, [you can't trust the network](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing). So Web capabilities aim to be adversarial in the evaluation of a request. (This also sometimes referred to as [zero-trust architecture](https://www.nccoe.nist.gov/library/implementing-zero-trust-architecture).)
 
@@ -10,11 +10,19 @@ This is why Web capabilities must not only be cryptographically signed by the is
 
 Web capabilities also follow the [principle of least privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege), since they can be verified without privileged access.
 
-### Designed for the Open Web
+### Standards-based
 
 The design of HTTP and other Web specifications is to [Create More Web](https://www.pandastrike.com/posts/20151019-create-more-web/). The Web accumulates value with each contribution to the ecosystem we all share and benefit from. 
 
 Capabilites can be moved across the network and verified by intermediaries. That's reflected in the entity names, issuer-recipient rather than server-client. This encourages decentralization and follows the principle of least privilege. It's more secure to verify requests outside of the main API process space. If an attacker manages to trigger an unexpected code path, they are less likely to have access to sensitive data. Web capabilities can even be verified in a system owned entirely by a third party.
+
+### Comprehensive
+
+Web Capabilities support delegation, revocation, key rotation, and expiry and embargoes. Anything you can do with access-control authorization, you can do with Web capabilities.
+
+### Performant
+
+Web Capabilities use a fast hashing algorithm for signatures. Sometimes even that is too slow, so Web Capabilities also support memoization, which converts a verified grant into a simple hash that supports sub-millisecond verification.
 
 ## The Capability Document
 
