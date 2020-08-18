@@ -2,6 +2,8 @@
 
 *Web Capabilities* provide authorization to perform a set of HTTP requests. They are modeled after [capability security models](https://en.wikipedia.org/wiki/Capability-based_security). Web capabilities adapt this idea by using cryptographic signatures to ensure they cannot be forged. They naturally extend the state transfer design of the Open Web, since they can be sent to the client, much like cookies.
 
+> *Disclaimer:* Web Capabilities are still an experimental technology. Do not use in domains where privacy and security risks are high.
+
 ### **Adversarial (Zero Trust)**
 
 In distributed systems like the Web, [you can't trust the network](https://en.wikipedia.org/wiki/Fallacies_of_distributed_computing). So Web capabilities aim to be adversarial in the evaluation of a request. (This also sometimes referred to as [zero-trust architecture](https://www.nccoe.nist.gov/library/implementing-zero-trust-architecture).)
