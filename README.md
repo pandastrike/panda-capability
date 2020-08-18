@@ -1,10 +1,6 @@
 ## Web Capabilities: Distributed Authorization For The Open Web
 
-*Web Capabilities* provide authorization to perform a set of HTTP requests. They are modeled after [capability security models](https://en.wikipedia.org/wiki/Capability-based_security) [emphasis added]:
-
-> Capabilities achieve their objective of improving system security by being used in place of forgeable references. A forgeable reference (for example, a path name) identifies an object, but does not specify which access rights are appropriate for that object and the user program which holds that reference. Consequently, any attempt to access the referenced object must be validated by the operating system, based on the ambient authority of the requesting program, typically via the use of an access control list (ACL). Instead, in a system with capabilities, the mere fact that a user program possesses that capability entitles it to use the referenced object in accordance with the rights that are specified by that capability. ***In theory, a system with capabilities removes the need for any access control list or similar mechanism*** by giving all entities all and only the capabilities they will actually need.
-
-Web capabilities adapt this idea by using cryptographic signatures to ensure they cannot be forged. They naturally extend the state transfer design of the Open Web, since they can be sent to the client, much like cookies.
+*Web Capabilities* provide authorization to perform a set of HTTP requests. They are modeled after [capability security models](https://en.wikipedia.org/wiki/Capability-based_security). Web capabilities adapt this idea by using cryptographic signatures to ensure they cannot be forged. They naturally extend the state transfer design of the Open Web, since they can be sent to the client, much like cookies.
 
 ### **Web Capabilities are Adversarial (Zero Trust)**
 
