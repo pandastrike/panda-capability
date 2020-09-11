@@ -28,7 +28,9 @@
     }
   ],
   "main": "build/npm/src/index.js",
+  "main:coffee": "src/index.coffee",
   "files": [
+    "src",
     "build/npm/src"
   ],
   "scripts": {
